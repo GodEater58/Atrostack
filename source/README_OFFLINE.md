@@ -1,31 +1,30 @@
-# AstroStack 1.2.0 Preview — Offline Windows Builder
+# AstroStack 1.4.0 Preview — Offline Windows Builder
 
-Questo pacchetto costruisce un singolo installer Windows x64 completamente offline.
+Questo pacchetto costruisce un singolo installer Windows x64 completamente offline per l'utente finale.
 
-## Cosa contiene il Setup finale
+## Cosa contiene il setup finale
 
-- AstroStack 1.2.0 Preview
-- Python 3.12.10 x64 privato
-- tutte le wheel necessarie (NumPy, SciPy, OpenCV, RawPy, TIFFFile, Astropy, ExifRead, PySide6, Requests e dipendenze)
-- launcher AstroStack.exe
+- AstroStack 1.4.0 Preview
+- runtime Python 3.12.10 x64 privato
+- dipendenze necessarie all'applicazione
+- launcher `AstroStack.exe`
 - collegamenti Desktop e Start
 - disinstallazione da App installate
 - associazione `.astrostack`
 
-Durante l'installazione finale `pip` viene eseguito con `--no-index` e `PIP_NO_INDEX=1`: il Setup non consulta PyPI e non richiede Internet.
+Le dipendenze vengono scaricate e incorporate durante la build. Il PC su cui viene installato AstroStack non deve scaricare nulla.
 
 ## Metodo consigliato: GitHub Actions
 
-1. carica questa cartella in un repository GitHub;
-2. apri **Actions → Build AstroStack Offline Windows**;
-3. premi **Run workflow**;
-4. scarica l'artifact `AstroStack-1.2.0-preview-offline-windows`.
-
-Il runner Windows scarica Python e le dipendenze *durante la build*, poi le incorpora nel singolo installer. L'utente finale non deve scaricare nulla.
+1. apri **Actions → Build Windows offline installer**;
+2. premi **Run workflow**;
+3. lascia la versione predefinita `1.4.0_preview` oppure specificane una;
+4. scarica l'artifact generato.
 
 ## Build locale su Windows
 
-Prerequisiti solo sulla macchina che CREA il Setup:
+Prerequisiti sulla sola macchina che crea il setup:
+
 - Python 3.12+
 - Go 1.23+
 - connessione Internet durante la build
@@ -34,22 +33,22 @@ Da PowerShell:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
-.\build_offline.ps1
+.\build_offline.ps1 -Version "1.4.0_preview"
 ```
 
-Output:
+Output previsto:
 
-- `AstroStack_Setup_Offline_1.2.0_preview.exe`
+- `AstroStack_Setup_Offline_1.4.0_preview.exe`
 - relativo checksum `.sha256.txt`
 
 ## Installazione finale
 
-Il Setup installa per utente in:
+Il setup installa per utente in:
 
 `%LOCALAPPDATA%\Programs\AstroStack`
 
-Non richiede privilegi amministrativi. Dopo la build, il PC su cui viene installato AstroStack può essere completamente offline.
+Non richiede privilegi amministrativi. Dopo la build, il PC di destinazione può essere completamente offline.
 
-## Nota SmartScreen
+## Firma digitale
 
-Finché l'eseguibile non è firmato con un certificato Authenticode, Windows può mostrare l'avviso SmartScreen. La firma digitale va aggiunta prima di una distribuzione pubblica.
+Finché l'eseguibile non è firmato con un certificato Authenticode, Windows può mostrare un avviso per l'eseguibile non firmato.
