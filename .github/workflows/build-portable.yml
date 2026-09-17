@@ -1,10 +1,10 @@
-name: Build Windows offline installer
+name: Build Windows portable ZIP
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Installer version label'
+        description: 'Portable package version label'
         required: false
         default: '1.4.0_preview'
   push:
@@ -21,15 +21,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: '1.23.x'
 
@@ -40,32 +40,34 @@ jobs:
           if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
             $version = '${{ inputs.version }}'
           } else {
-            $version = '${{ github.ref_name }}'.TrimStart('v')
+            $version = '${{ github.ref_name }}'.TrimStart('v').Replace('-', '_')
           }
           "value=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Build offline installer
+      - name: Build portable ZIP
         shell: pwsh
         env:
           GO111MODULE: 'off'
-        run: ./source/build_offline.ps1 -Version '${{ steps.version.outputs.value }}'
+          PYTHONUTF8: '1'
+          PYTHONIOENCODING: 'utf-8'
+        run: ./source/build_portable.ps1 -Version '${{ steps.version.outputs.value }}'
 
-      - name: Verify installer files
+      - name: Verify package files
         shell: pwsh
         run: |
-          $exe = Get-ChildItem source/AstroStack_Setup_Offline_*.exe | Select-Object -First 1
-          $sha = Get-ChildItem source/AstroStack_Setup_Offline_*.sha256.txt | Select-Object -First 1
-          if (-not $exe -or -not $sha) { throw 'Installer or checksum missing.' }
-          Write-Host "Installer: $($exe.FullName)"
+          $zip = Get-ChildItem source/AstroStack_*_Windows_x64.zip | Select-Object -First 1
+          $sha = Get-ChildItem source/AstroStack_*_Windows_x64.zip.sha256.txt | Select-Object -First 1
+          if (-not $zip -or -not $sha) { throw 'Portable ZIP or checksum missing.' }
+          Write-Host "ZIP: $($zip.FullName)"
           Write-Host "Checksum: $($sha.FullName)"
 
-      - name: Upload build artifact
+      - name: Upload portable package
         uses: actions/upload-artifact@v4
         with:
-          name: AstroStack-Windows-${{ steps.version.outputs.value }}
+          name: AstroStack-Windows-Portable-${{ steps.version.outputs.value }}
           path: |
-            source/AstroStack_Setup_Offline_*.exe
-            source/AstroStack_Setup_Offline_*.sha256.txt
+            source/AstroStack_*_Windows_x64.zip
+            source/AstroStack_*_Windows_x64.zip.sha256.txt
           if-no-files-found: error
 
       - name: Publish GitHub Release for tags
@@ -75,7 +77,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create '${{ github.ref_name }}' `
-            source/AstroStack_Setup_Offline_*.exe `
-            source/AstroStack_Setup_Offline_*.sha256.txt `
+            source/AstroStack_*_Windows_x64.zip `
+            source/AstroStack_*_Windows_x64.zip.sha256.txt `
             --title 'AstroStack ${{ github.ref_name }}' `
             --generate-notes

@@ -12,13 +12,13 @@ Il sorgente attuale dell'applicazione si trova in `source/app/`.
 
 - `source/app/astrostack/` — codice dell'applicazione
 - `source/app/tests/` — test e regressioni
-- `source/build_offline.ps1` — build dell'installer Windows offline
-- `.github/workflows/ci.yml` — test automatici
-- `.github/workflows/build-windows.yml` — build installer e release
+- `source/build_portable.ps1` — build dello ZIP portable Windows
+- `.github/workflows/ci.yml` — test manuali
+- `.github/workflows/build-portable.yml` — build ZIP e release
 
 ## Ambiente di sviluppo
 
-Richiede Python 3.12 per riprodurre l'ambiente usato in CI.
+Richiede Python 3.12 per riprodurre l'ambiente di riferimento.
 
 ```powershell
 python -m venv .venv
@@ -46,10 +46,12 @@ $env:QT_QPA_PLATFORM = "offscreen"
 python source/app/tests/smoke_gui.py
 ```
 
+Il workflow CI può essere avviato manualmente da GitHub Actions quando serve una verifica completa.
+
 ## Pull request
 
 Mantieni ogni PR focalizzata su un singolo obiettivo. Descrivi cosa cambia, come è stato testato e allega screenshot quando la modifica riguarda l'interfaccia.
 
-Non includere nella PR build locali, runtime Python, file `.exe`, ZIP, log o crash report: sono esclusi dal `.gitignore` e gli installer vengono generati da GitHub Actions.
+Non includere build locali, runtime Python, ZIP, log o crash report nel repository. I pacchetti portable vengono generati dalla build dedicata.
 
 Quando descrivi funzioni o obiettivi del progetto, preferisci descrizioni tecniche dirette ed evita confronti promozionali con applicazioni di terze parti.
