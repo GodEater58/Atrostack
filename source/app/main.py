@@ -36,15 +36,28 @@ def main() -> int:
         app.setWindowIcon(QIcon(icon))
     win = MainWindow()
     install_ux_v13(win)
+
+    startup_project = None
+    if len(sys.argv) > 1:
+        candidate = os.path.abspath(sys.argv[1])
+        if candidate.lower().endswith('.astrostack') and os.path.isfile(candidate):
+            startup_project = candidate
+
     win.setWindowOpacity(0.0)
     win.show()
-    from PySide6.QtCore import QEasingCurve, QPropertyAnimation
+    from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QTimer
     fade = QPropertyAnimation(win, b"windowOpacity", win)
     fade.setDuration(350)
     fade.setStartValue(0.0)
     fade.setEndValue(1.0)
     fade.setEasingCurve(QEasingCurve.Type.OutCubic)
     fade.start()
+    if startup_project:
+        QTimer.singleShot(
+            0,
+            lambda p=startup_project: win.open_project(path=p),
+        )
+
     return app.exec()
 
 

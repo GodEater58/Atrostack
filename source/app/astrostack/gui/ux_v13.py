@@ -1,4 +1,4 @@
-﻿"""UX aggiuntiva AstroStack 1.3.
+"""UX aggiuntiva AstroStack 1.3.
 
 Mantiene il core 1.2 stabile e aggiunge Home, modalitÃ  semplice,
 recovery, riepilogo stack e preset astronomici.

@@ -8,7 +8,7 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $ErrorActionPreference = 'Stop'
-$Version = '1.2.0-preview-offline'
+$Version = '1.3.0-preview-offline'
 $InstallDir = Join-Path $env:LOCALAPPDATA 'Programs\AstroStack'
 $RuntimeDir = Join-Path $InstallDir 'runtime'
 $StartMenuDir = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\AstroStack'
@@ -28,7 +28,7 @@ $WheelsDir = Join-Path $env:TEMP ('AstroStack-wheels-' + [guid]::NewGuid().ToStr
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBlock Text="AstroStack 1.2.0 Preview" FontSize="25" FontWeight="SemiBold"/>
+    <TextBlock Text="AstroStack 1.3.0 Preview" FontSize="25" FontWeight="SemiBold"/>
     <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="Installazione offline completa · nessuna connessione richiesta" Foreground="#8FA7C2" FontSize="13"/>
     <ProgressBar Name="Bar" Grid.Row="2" Margin="0,26,0,0" Height="16" Minimum="0" Maximum="100" Value="2"/>
     <TextBlock Name="Status" Grid.Row="3" Margin="0,18,0,0" Text="Preparazione…" TextWrapping="Wrap" FontSize="13"/>
