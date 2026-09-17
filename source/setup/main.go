@@ -14,39 +14,31 @@ var payload []byte
 //go:embed install_offline.ps1
 var installerPS []byte
 
-//go:embed python-runtime.exe
-var pythonRuntime []byte
-
-//go:embed wheelhouse.zip
-var wheelhouse []byte
-
 func write(path string, data []byte) error {
     return os.WriteFile(path, data, 0600)
 }
 
-func main() {
+func run() int {
     dir, err := os.MkdirTemp("", "AstroStack-Offline-Setup-*")
-    if err != nil { return }
+    if err != nil { return 1 }
     defer os.RemoveAll(dir)
 
     zipPath := filepath.Join(dir, "payload.zip")
     psPath := filepath.Join(dir, "install_offline.ps1")
-    pyPath := filepath.Join(dir, "python-runtime.exe")
-    wheelsPath := filepath.Join(dir, "wheelhouse.zip")
 
-    if write(zipPath, payload) != nil { return }
-    if write(psPath, installerPS) != nil { return }
-    if write(pyPath, pythonRuntime) != nil { return }
-    if write(wheelsPath, wheelhouse) != nil { return }
+    if write(zipPath, payload) != nil { return 1 }
+    if write(psPath, installerPS) != nil { return 1 }
 
-    cmd := exec.Command(
-        "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA",
+    args := []string{ "-NoProfile", "-ExecutionPolicy", "Bypass", "-STA",
         "-WindowStyle", "Hidden", "-File", psPath,
         "-PayloadZip", zipPath,
-        "-PythonInstaller", pyPath,
-        "-WheelhouseZip", wheelsPath,
-    )
+    }
+    if len(os.Args) == 2 && os.Args[1] == "-Silent" { args = append(args, "-Silent") }
+    cmd := exec.Command("powershell.exe", args...)
     cmd.Dir = dir
     cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-    _ = cmd.Run()
+    if err := cmd.Run(); err != nil { return 1 }
+    return 0
 }
+
+func main() { os.Exit(run()) }

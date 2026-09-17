@@ -1,69 +1,48 @@
-param(
-    [string]$Version = '1.3.1_preview'
-)
+param([string]$Version = '1.3.2_preview')
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Build = Join-Path $Root 'build'
-$Wheelhouse = Join-Path $Build 'wheelhouse'
 $Setup = Join-Path $Root 'setup'
 $Payload = Join-Path $Build 'payload'
-$PythonUrl = 'https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe'
-$PythonInstaller = Join-Path $Setup 'python-runtime.exe'
+$Runtime = Join-Path $Payload 'runtime'
+$Wheelhouse = Join-Path $Build 'wheelhouse'
 $Output = Join-Path $Root ("AstroStack_Setup_Offline_{0}.exe" -f $Version)
-
-Write-Host '=== AstroStack Offline Builder ===' -ForegroundColor Cyan
-if (-not (Get-Command go.exe -ErrorAction SilentlyContinue)) {
-    throw 'Go non trovato. Installa Go 1.23+ oppure usa la GitHub Action inclusa.'
-}
-if (-not (Get-Command python.exe -ErrorAction SilentlyContinue)) {
-    throw 'Python non trovato. Serve solo per preparare il wheelhouse durante la build.'
-}
-
-Remove-Item $Build -Recurse -Force -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Path $Wheelhouse,$Payload -Force | Out-Null
-
-Write-Host '[1/7] Compilo il launcher Windows...'
+if (-not (Get-Command go.exe -ErrorAction SilentlyContinue)) { throw 'Go mancante.' }
+if (-not (Get-Command python.exe -ErrorAction SilentlyContinue)) { throw 'Python di build mancante.' }
+if ([IO.Path]::GetFullPath($Build) -ne [IO.Path]::GetFullPath((Join-Path $Root 'build'))) { throw 'Percorso build non valido.' }
+if (Test-Path -LiteralPath $Build) { Remove-Item -LiteralPath $Build -Recurse -Force }
+New-Item -ItemType Directory -Path $Runtime,$Wheelhouse -Force | Out-Null
+Write-Host '[1/5] Compilo il launcher...'
 Push-Location (Join-Path $Root 'launcher')
-$env:GOOS='windows'; $env:GOARCH='amd64'; $env:CGO_ENABLED='0'
-go build -trimpath -ldflags '-s -w -H=windowsgui' -o (Join-Path $Payload 'AstroStack.exe') .
-if ($LASTEXITCODE -ne 0) { throw 'Compilazione launcher fallita.' }
-Pop-Location
-
-Write-Host '[2/7] Copio AstroStack nel payload...'
-Copy-Item (Join-Path $Root 'app') (Join-Path $Payload 'app') -Recurse
-
-Write-Host '[3/7] Scarico il runtime Python Windows ufficiale...'
-Invoke-WebRequest -Uri $PythonUrl -OutFile $PythonInstaller -UseBasicParsing
-
-Write-Host '[4/7] Scarico tutte le wheel Windows x64...'
+try {
+    $env:GOOS='windows'; $env:GOARCH='amd64'; $env:CGO_ENABLED='0'
+    go build -trimpath -ldflags '-s -w -H=windowsgui' -o (Join-Path $Payload 'AstroStack.exe') .
+    if ($LASTEXITCODE) { throw 'Build launcher fallita.' }
+} finally { Pop-Location }
+Copy-Item -LiteralPath (Join-Path $Root 'app') -Destination (Join-Path $Payload 'app') -Recurse
+Write-Host '[2/5] Preparo Python embeddable privato...'
+$RuntimeZip = Join-Path $Build 'python-embed.zip'
+Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip' -OutFile $RuntimeZip -UseBasicParsing
+Expand-Archive -LiteralPath $RuntimeZip -DestinationPath $Runtime
+# Explicit isolated search paths: no registry, PYTHONPATH or user packages.
+@('python312.zip','.','Lib\site-packages','..\app','import site') | Set-Content -LiteralPath (Join-Path $Runtime 'python312._pth') -Encoding ascii
+Write-Host '[3/5] Includo le dipendenze durante la build...'
 $Req = Join-Path $Root 'app\requirements.txt'
 python -m pip download --only-binary=:all: --platform win_amd64 --python-version 312 --implementation cp --abi cp312 --dest $Wheelhouse -r $Req
-if ($LASTEXITCODE -ne 0) { throw 'Download wheel fallito.' }
-
-# Includi anche pip/setuptools/wheel nel caso il runtime abbia bisogno di aggiornamento locale.
-python -m pip download --only-binary=:all: --platform win_amd64 --python-version 312 --implementation py3 --dest $Wheelhouse pip setuptools wheel
-if ($LASTEXITCODE -ne 0) { throw 'Download toolchain pip fallito.' }
-
-Write-Host '[5/7] Creo payload.zip e wheelhouse.zip...'
+if ($LASTEXITCODE) { throw 'Download wheel fallito.' }
+python -m pip install --no-index --no-compile --only-binary=:all: --find-links $Wheelhouse --target (Join-Path $Runtime 'Lib\site-packages') -r $Req
+if ($LASTEXITCODE) { throw 'Preparazione librerie fallita.' }
+& (Join-Path $Runtime 'python.exe') (Join-Path $Payload 'app\verify_runtime.py')
+if ($LASTEXITCODE) { throw 'Verifica runtime privato fallita.' }
+Write-Host '[4/5] Compilo il setup con il payload completo...'
 $PayloadZip = Join-Path $Setup 'payload.zip'
-$WheelZip = Join-Path $Setup 'wheelhouse.zip'
-Remove-Item $PayloadZip,$WheelZip -Force -ErrorAction SilentlyContinue
-Compress-Archive -Path (Join-Path $Payload '*') -DestinationPath $PayloadZip -CompressionLevel Optimal
-Compress-Archive -Path (Join-Path $Wheelhouse '*') -DestinationPath $WheelZip -CompressionLevel Optimal
-
-Write-Host '[6/7] Compilo il Setup offline singolo...'
+Compress-Archive -Path (Join-Path $Payload '*') -DestinationPath $PayloadZip -CompressionLevel Optimal -Force
 Push-Location $Setup
-$env:GOOS='windows'; $env:GOARCH='amd64'; $env:CGO_ENABLED='0'
-go build -trimpath -ldflags '-s -w -H=windowsgui' -o $Output .
-if ($LASTEXITCODE -ne 0) { throw 'Compilazione installer fallita.' }
-Pop-Location
-
-Write-Host '[7/7] Creo checksum SHA-256...'
-$Hash = (Get-FileHash $Output -Algorithm SHA256).Hash.ToLowerInvariant()
-$HashFile = "$Output.sha256.txt"
-"$Hash  $(Split-Path $Output -Leaf)" | Set-Content -Path $HashFile -Encoding ascii
-
-Write-Host ''
-Write-Host 'Build completata:' -ForegroundColor Green
+try {
+    go build -trimpath -ldflags '-s -w -H=windowsgui' -o $Output .
+    if ($LASTEXITCODE) { throw 'Build setup fallita.' }
+} finally { Pop-Location }
+Write-Host '[5/5] Creo checksum SHA-256...'
+$Hash = (Get-FileHash -LiteralPath $Output -Algorithm SHA256).Hash.ToLowerInvariant()
+"$Hash  $(Split-Path $Output -Leaf)" | Set-Content -LiteralPath "$Output.sha256.txt" -Encoding ascii
 Write-Host $Output
-Write-Host $HashFile

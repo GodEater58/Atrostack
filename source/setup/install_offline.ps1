@@ -1,22 +1,25 @@
-param(
+﻿param(
     [Parameter(Mandatory=$true)][string]$PayloadZip,
-    [Parameter(Mandatory=$true)][string]$PythonInstaller,
-    [Parameter(Mandatory=$true)][string]$WheelhouseZip
+    [switch]$Silent
 )
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $ErrorActionPreference = 'Stop'
-$Version = '1.3.1-preview-offline'
+$Version = '1.3.2-preview-offline'
 $InstallDir = Join-Path $env:LOCALAPPDATA 'Programs\AstroStack'
 $RuntimeDir = Join-Path $InstallDir 'runtime'
 $StartMenuDir = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\AstroStack'
 $DesktopLink = Join-Path ([Environment]::GetFolderPath('Desktop')) 'AstroStack.lnk'
 $StartLink = Join-Path $StartMenuDir 'AstroStack.lnk'
 $UninstallLink = Join-Path $StartMenuDir 'Disinstalla AstroStack.lnk'
-$WheelsDir = Join-Path $env:TEMP ('AstroStack-wheels-' + [guid]::NewGuid().ToString('N'))
+$StagingDir = Join-Path (Split-Path $InstallDir) ('AstroStack-staging-' + [guid]::NewGuid().ToString('N'))
+$LogPath = Join-Path $env:TEMP 'AstroStack-install.log'
+$script:InstallExitCode = 0
+Start-Transcript -Path $LogPath -Force | Out-Null
 
+if (-not $Silent) {
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         Title="AstroStack Setup Offline" Height="265" Width="580" WindowStartupLocation="CenterScreen"
@@ -28,7 +31,7 @@ $WheelsDir = Join-Path $env:TEMP ('AstroStack-wheels-' + [guid]::NewGuid().ToStr
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBlock Text="AstroStack 1.3.1 Preview" FontSize="25" FontWeight="SemiBold"/>
+    <TextBlock Text="AstroStack 1.3.2 Preview" FontSize="25" FontWeight="SemiBold"/>
     <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="Installazione offline completa · nessuna connessione richiesta" Foreground="#8FA7C2" FontSize="13"/>
     <ProgressBar Name="Bar" Grid.Row="2" Margin="0,26,0,0" Height="16" Minimum="0" Maximum="100" Value="2"/>
     <TextBlock Name="Status" Grid.Row="3" Margin="0,18,0,0" Text="Preparazione…" TextWrapping="Wrap" FontSize="13"/>
@@ -39,8 +42,11 @@ $reader = New-Object System.Xml.XmlNodeReader $xaml
 $win = [Windows.Markup.XamlReader]::Load($reader)
 $bar = $win.FindName('Bar')
 $status = $win.FindName('Status')
+}
 
 function Set-Stage([string]$Text, [int]$Value) {
+    Write-Host $Text
+    if ($Silent) { return }
     $status.Text = $Text
     $bar.Value = $Value
     $win.Dispatcher.Invoke([action]{}, 'Background')
@@ -62,34 +68,20 @@ function New-Shortcut([string]$Path, [string]$Target, [string]$Arguments='') {
     $s.Save()
 }
 
-$win.Add_ContentRendered({
+function Install-AstroStack {
     try {
-        Set-Stage 'Copio i file di AstroStack…' 8
-        if (Test-Path $InstallDir) { Remove-Item $InstallDir -Recurse -Force }
-        New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($PayloadZip, $InstallDir)
-
-        Set-Stage 'Installo il runtime Python privato incluso nel Setup…' 24
-        $pyArgs = @('/quiet','InstallAllUsers=0',("TargetDir=`"$RuntimeDir`""),'Include_pip=1','Include_launcher=0','Include_test=0','Include_doc=0','Include_tcltk=0','Include_dev=0','PrependPath=0','Shortcuts=0')
-        Run-Process $PythonInstaller $pyArgs
-
-        $python = Join-Path $RuntimeDir 'python.exe'
-        if (-not (Test-Path $python)) { throw 'Runtime Python non trovato dopo l’installazione.' }
-
-        Set-Stage 'Estraggo le librerie offline incluse nel Setup…' 42
-        New-Item -ItemType Directory -Path $WheelsDir -Force | Out-Null
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($WheelhouseZip, $WheelsDir)
-
-        Set-Stage 'Installo GUI e motori di elaborazione dal pacchetto locale…' 55
-        $req = Join-Path $InstallDir 'app\requirements.txt'
-        # Blocca esplicitamente qualsiasi accesso agli indici online.
-        $env:PIP_NO_INDEX = '1'
-        $env:PIP_DISABLE_PIP_VERSION_CHECK = '1'
-        Run-Process $python @('-m','pip','install','--no-index','--disable-pip-version-check','--no-warn-script-location','--find-links',("`"$WheelsDir`""),'-r',("`"$req`""))
-
-        Set-Stage 'Verifico l’installazione…' 78
-        $verify = 'import numpy, scipy, cv2, rawpy, tifffile, astropy, exifread, PySide6, requests; print("ok")'
-        Run-Process $python @('-c',("`"$verify`""))
+        Set-Stage 'Estraggo applicazione e runtime privato...' 15
+        New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($PayloadZip, $StagingDir)
+        $python = Join-Path $StagingDir 'runtime\python.exe'
+        if (-not (Test-Path -LiteralPath $python)) { throw 'Runtime privato assente nel pacchetto.' }
+        Set-Stage 'Verifico il runtime e le librerie incluse...' 70
+        Run-Process $python @(('"' + (Join-Path $StagingDir 'app\verify_runtime.py') + '"'))
+        # Replace only our fixed application directory, after validating the payload.
+        $expected = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'Programs\AstroStack'))
+        if ([IO.Path]::GetFullPath($InstallDir) -ne $expected) { throw 'Percorso installazione non valido.' }
+        if (Test-Path -LiteralPath $InstallDir) { Remove-Item -LiteralPath $InstallDir -Recurse -Force }
+        Move-Item -LiteralPath $StagingDir -Destination $InstallDir
 
         Set-Stage 'Creo collegamenti e integrazione con Windows…' 88
         New-Item -ItemType Directory -Path $StartMenuDir -Force | Out-Null
@@ -134,18 +126,33 @@ Start-Process cmd.exe -ArgumentList '/c', "timeout /t 2 /nobreak >nul & rmdir /s
         New-ItemProperty $unKey -Name NoModify -PropertyType DWord -Value 1 -Force | Out-Null
         New-ItemProperty $unKey -Name NoRepair -PropertyType DWord -Value 1 -Force | Out-Null
 
-        Remove-Item $WheelsDir -Recurse -Force -ErrorAction SilentlyContinue
         Set-Stage 'Installazione offline completata.' 100
         Start-Sleep -Milliseconds 500
+        if (-not $Silent) {
         $win.Close()
         $go = [System.Windows.MessageBox]::Show('AstroStack è installato. Vuoi avviarlo ora?','AstroStack',[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Information)
-        if ($go -eq [System.Windows.MessageBoxResult]::Yes) { Start-Process $launcher }
+        if ($go -eq [System.Windows.MessageBoxResult]::Yes) { Start-Process $launcher -WindowStyle Hidden }
+        }
     }
     catch {
-        Remove-Item $WheelsDir -Recurse -Force -ErrorAction SilentlyContinue
-        $win.Close()
-        [System.Windows.MessageBox]::Show("Installazione non riuscita:`n`n$($_.Exception.Message)",'AstroStack Setup Offline',[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Error) | Out-Null
+        $script:InstallExitCode = 1
+        Write-Host $_.Exception.ToString()
+        if (-not $Silent) {
+            $win.Close()
+            [System.Windows.MessageBox]::Show("Installazione non riuscita:`n`n$($_.Exception.Message)`n`nLog: $LogPath", 'AstroStack Setup Offline') | Out-Null
+        }
     }
-})
-
-$win.ShowDialog() | Out-Null
+    finally {
+        $parent = [IO.Path]::GetFullPath((Split-Path $InstallDir)) + [IO.Path]::DirectorySeparatorChar
+        if ([IO.Path]::GetFullPath($StagingDir).StartsWith($parent) -and (Split-Path $StagingDir -Leaf) -like 'AstroStack-staging-*') {
+            if (Test-Path -LiteralPath $StagingDir) { Remove-Item -LiteralPath $StagingDir -Recurse -Force }
+        }
+    }
+}
+if ($Silent) { Install-AstroStack }
+else {
+    $win.Add_ContentRendered({ Install-AstroStack })
+    $win.ShowDialog() | Out-Null
+}
+Stop-Transcript | Out-Null
+exit $script:InstallExitCode
