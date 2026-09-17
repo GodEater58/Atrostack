@@ -1,0 +1,49 @@
+name: Richiesta funzione
+description: Proponi un miglioramento o una nuova funzione per AstroStack
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Descrivi il problema che vuoi risolvere prima della soluzione proposta.
+
+  - type: textarea
+    id: need
+    attributes:
+      label: Esigenza
+      description: Cosa manca oggi o quale passaggio vorresti rendere più semplice?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Soluzione proposta
+      description: Come immagini che dovrebbe funzionare?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Stacking
+        - Editor
+        - Calibrazione / allineamento
+        - Live stacking
+        - Esportazione
+        - Interfaccia / UX
+        - Installer / aggiornamenti
+        - Prestazioni
+        - Altro
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contesto aggiuntivo
+      description: Screenshot, esempi o riferimenti utili.
