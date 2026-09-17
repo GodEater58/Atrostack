@@ -1,0 +1,66 @@
+name: Bug report
+description: Segnala un problema riproducibile di AstroStack
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Grazie per la segnalazione. Inserisci abbastanza dettagli da permettere di riprodurre il problema.
+
+  - type: input
+    id: version
+    attributes:
+      label: Versione AstroStack
+      placeholder: es. 1.3.2-preview
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installazione
+      options:
+        - Installer Windows offline
+        - Avvio da sorgente Python
+        - Altro
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Cosa è successo e cosa ti aspettavi che succedesse?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passaggi per riprodurlo
+      placeholder: |
+        1. Apri...
+        2. Carica...
+        3. Premi...
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Log, crash report o screenshot
+      description: Trascina qui eventuali log, crash report o immagini utili. Non pubblicare dati personali o API key.
+
+  - type: input
+    id: windows
+    attributes:
+      label: Sistema operativo
+      placeholder: es. Windows 11 24H2
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware rilevante
+      placeholder: CPU, RAM, GPU e quantità/dimensione dei frame
