@@ -1,0 +1,12 @@
+1. Copia apply_home_polish_133.py nella root:
+   C:\Users\nicol\Documents\Atrostack
+
+2. Esegui:
+   python .\apply_home_polish_133.py
+
+3. Poi:
+   cd source\app
+   python tests\test_home_133.py
+
+4. Se ottieni ASTROSTACK_133_HOME_OK:
+   Start-Process python -ArgumentList "main.py"

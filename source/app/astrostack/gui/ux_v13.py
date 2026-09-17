@@ -130,8 +130,10 @@ def _find_splitter(window):
 
 
 def _install_home(window):
-    root = _main_layout(window)
+    """Home 1.3.3: azioni principali, progetto recente e guida rapida."""
+    from astrostack import __version__
 
+    root = _main_layout(window)
     splitter = _find_splitter(window)
 
     if splitter is None:
@@ -143,126 +145,182 @@ def _install_home(window):
     panel.setProperty("role", "panel")
 
     layout = QVBoxLayout(panel)
+    layout.setContentsMargins(48, 36, 48, 36)
+    layout.setSpacing(18)
 
-    layout.setContentsMargins(
-        44,
-        40,
-        44,
-        40,
-    )
+    hero = QHBoxLayout()
+    hero.setSpacing(24)
 
-    layout.setSpacing(14)
-    layout.addStretch(1)
+    hero_text = QVBoxLayout()
+    hero_text.setSpacing(6)
+
+    eyebrow = QLabel("ASTROSTACK")
+    eyebrow.setProperty("role", "section")
+    hero_text.addWidget(eyebrow)
 
     title = QLabel(
-        "Benvenuto in AstroStack"
+        "Dal RAW al cielo finito,\n"
+        "con un flusso più semplice."
     )
-
-    title.setProperty(
-        "role",
-        "title",
-    )
-
-    layout.addWidget(title)
+    title.setProperty("role", "title")
+    title.setWordWrap(True)
+    hero_text.addWidget(title)
 
     subtitle = QLabel(
-        "Scegli cosa vuoi fare. "
-        "Puoi creare uno stack oppure "
-        "aprire direttamente una fotografia "
-        "nell'Editor."
+        "Stacking, calibrazione e sviluppo fotografico "
+        "in un'unica applicazione. Scegli da dove vuoi iniziare."
     )
-
-    subtitle.setProperty(
-        "role",
-        "muted",
-    )
-
+    subtitle.setProperty("role", "muted")
     subtitle.setWordWrap(True)
+    hero_text.addWidget(subtitle)
 
-    layout.addWidget(subtitle)
-    layout.addSpacing(10)
+    hero.addLayout(hero_text, 1)
 
-    row = QHBoxLayout()
-    row.setSpacing(10)
+    hero_meta = QVBoxLayout()
+    hero_meta.setSpacing(4)
 
-    window.btn_home_stack = AnimatedButton(
-        "âœ¦  Nuovo stack",
-        "primary",
+    window.home_version_label = QLabel(f"v{__version__}")
+    window.home_version_label.setProperty("role", "sectionTitle")
+    window.home_version_label.setAlignment(
+        Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
     )
+    hero_meta.addWidget(window.home_version_label)
 
-    window.btn_home_editor = AnimatedButton(
-        "Apri nell'Editorâ€¦"
-    )
+    local_label = QLabel("Elaborazione locale • progetto offline-first")
+    local_label.setProperty("role", "muted")
+    local_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+    hero_meta.addWidget(local_label)
+    hero_meta.addStretch(1)
 
-    window.btn_home_project = AnimatedButton(
-        "Apri progettoâ€¦"
-    )
+    hero.addLayout(hero_meta)
+    layout.addLayout(hero)
+
+    section = QLabel("INIZIA")
+    section.setProperty("role", "section")
+    layout.addWidget(section)
+
+    cards = QHBoxLayout()
+    cards.setSpacing(12)
+
+    window.btn_home_stack = AnimatedButton("Nuovo stack", "primary")
+    window.btn_home_editor = AnimatedButton("Apri nell'Editor…")
+    window.btn_home_project = AnimatedButton("Apri progetto…")
 
     window.btn_home_stack.clicked.connect(
-        lambda:
-            window._set_workspace("stack")
+        lambda: window._set_workspace("stack")
+    )
+    window.btn_home_editor.clicked.connect(window._enter_editor)
+    window.btn_home_project.clicked.connect(lambda: window.open_project())
+
+    def add_card(kicker, heading, description, button):
+        card = QFrame()
+        card.setProperty("role", "panel")
+
+        card_layout = QVBoxLayout(card)
+        card_layout.setContentsMargins(18, 16, 18, 16)
+        card_layout.setSpacing(7)
+
+        tag = QLabel(kicker)
+        tag.setProperty("role", "section")
+        card_layout.addWidget(tag)
+
+        heading_label = QLabel(heading)
+        heading_label.setProperty("role", "sectionTitle")
+        heading_label.setWordWrap(True)
+        card_layout.addWidget(heading_label)
+
+        description_label = QLabel(description)
+        description_label.setProperty("role", "muted")
+        description_label.setWordWrap(True)
+        card_layout.addWidget(description_label)
+
+        card_layout.addStretch(1)
+        card_layout.addWidget(button)
+
+        cards.addWidget(card, 1)
+
+    add_card(
+        "STACK",
+        "Combina i tuoi scatti",
+        "Importa Light, Dark, Flat e Bias. "
+        "AstroStack calibra, allinea, valuta e combina i frame.",
+        window.btn_home_stack,
+    )
+    add_card(
+        "EDITOR",
+        "Sviluppa una foto",
+        "Apri direttamente RAW, FITS, TIFF, PNG o JPG "
+        "senza dover creare prima uno stack.",
+        window.btn_home_editor,
+    )
+    add_card(
+        "PROGETTI",
+        "Riprendi il lavoro",
+        "Apri un progetto .astrostack con sviluppo, "
+        "livelli, snapshot e impostazioni già salvati.",
+        window.btn_home_project,
     )
 
-    window.btn_home_editor.clicked.connect(
-        window._enter_editor
+    layout.addLayout(cards)
+
+    recent = QFrame()
+    recent.setProperty("role", "panel")
+
+    recent_layout = QHBoxLayout(recent)
+    recent_layout.setContentsMargins(18, 14, 18, 14)
+    recent_layout.setSpacing(16)
+
+    recent_text = QVBoxLayout()
+    recent_text.setSpacing(3)
+
+    recent_title = QLabel("CONTINUA DA DOVE ERI RIMASTO")
+    recent_title.setProperty("role", "section")
+    recent_text.addWidget(recent_title)
+
+    window.home_recent_name = QLabel("Nessun progetto recente")
+    window.home_recent_name.setProperty("role", "sectionTitle")
+    recent_text.addWidget(window.home_recent_name)
+
+    window.home_recent_path = QLabel("Salva un progetto per ritrovarlo qui.")
+    window.home_recent_path.setProperty("role", "muted")
+    window.home_recent_path.setWordWrap(True)
+    recent_text.addWidget(window.home_recent_path)
+
+    recent_layout.addLayout(recent_text, 1)
+
+    window.btn_home_recent = AnimatedButton("Continua")
+    window.btn_home_recent.clicked.connect(lambda: _open_recent(window))
+    recent_layout.addWidget(window.btn_home_recent)
+
+    layout.addWidget(recent)
+
+    footer = QHBoxLayout()
+    footer.setSpacing(12)
+
+    window.home_mode_hint = QLabel(
+        "Parti in modalità Semplice; passa ad Avanzata "
+        "quando vuoi tutti i controlli."
     )
+    window.home_mode_hint.setProperty("role", "muted")
+    window.home_mode_hint.setWordWrap(True)
+    footer.addWidget(window.home_mode_hint, 1)
 
-    window.btn_home_project.clicked.connect(
-        lambda:
-            window.open_project()
+    drag_hint = QLabel(
+        "Suggerimento: puoi trascinare file e cartelle "
+        "direttamente dentro AstroStack."
     )
+    drag_hint.setProperty("role", "muted")
+    drag_hint.setWordWrap(True)
+    drag_hint.setAlignment(Qt.AlignmentFlag.AlignRight)
+    footer.addWidget(drag_hint, 1)
 
-    row.addWidget(
-        window.btn_home_stack
-    )
-
-    row.addWidget(
-        window.btn_home_editor
-    )
-
-    row.addWidget(
-        window.btn_home_project
-    )
-
-    layout.addLayout(row)
-
-    window.btn_home_recent = AnimatedButton(
-        "Continua ultimo progetto"
-    )
-
-    window.btn_home_recent.clicked.connect(
-        lambda:
-            _open_recent(window)
-    )
-
-    layout.addWidget(
-        window.btn_home_recent
-    )
-
-    hint = QLabel(
-        "Puoi anche trascinare immagini o "
-        "cartelle direttamente dentro AstroStack."
-    )
-
-    hint.setProperty(
-        "role",
-        "muted",
-    )
-
-    hint.setWordWrap(True)
-
-    layout.addWidget(hint)
-    layout.addStretch(2)
+    layout.addLayout(footer)
+    layout.addStretch(1)
 
     window.home_panel = panel
 
     index = root.indexOf(splitter)
-
-    root.insertWidget(
-        index,
-        panel,
-        1,
-    )
+    root.insertWidget(index, panel, 1)
 
     _refresh_recent_button(window)
 
@@ -754,28 +812,49 @@ def _open_recent(window):
 
 
 def _refresh_recent_button(window):
-    if not hasattr(
-        window,
-        "btn_home_recent",
-    ):
+    if not hasattr(window, "btn_home_recent"):
         return
 
     path = str(
-        QSettings(
-            "AstroStack",
-            "AstroStack",
-        ).value(
-            "recent_project",
-            "",
-        ) or ""
+        QSettings("AstroStack", "AstroStack").value("recent_project", "") or ""
     )
 
-    window.btn_home_recent.setEnabled(
-        bool(
-            path
-            and os.path.isfile(path)
+    available = bool(path and os.path.isfile(path))
+    window.btn_home_recent.setEnabled(available)
+
+    if available:
+        window.btn_home_recent.setText("Continua")
+        window.btn_home_recent.setToolTip(path)
+
+        if hasattr(window, "home_recent_name"):
+            window.home_recent_name.setText(os.path.basename(path))
+
+        if hasattr(window, "home_recent_path"):
+            window.home_recent_path.setText(path)
+
+    elif path:
+        window.btn_home_recent.setText("Non disponibile")
+        window.btn_home_recent.setToolTip(
+            "Il progetto recente non è più nel percorso salvato."
         )
-    )
+
+        if hasattr(window, "home_recent_name"):
+            window.home_recent_name.setText("Progetto recente non trovato")
+
+        if hasattr(window, "home_recent_path"):
+            window.home_recent_path.setText(path)
+
+    else:
+        window.btn_home_recent.setText("Continua")
+        window.btn_home_recent.setToolTip("")
+
+        if hasattr(window, "home_recent_name"):
+            window.home_recent_name.setText("Nessun progetto recente")
+
+        if hasattr(window, "home_recent_path"):
+            window.home_recent_path.setText(
+                "Salva un progetto per ritrovarlo qui."
+            )
 
 
 def _open_project_path(

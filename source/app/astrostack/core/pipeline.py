@@ -49,7 +49,7 @@ class Settings:
     max_stars: int = 250
     detection_sigma: float = 5.0
     white_balance: str = "daylight"  # daylight | camera | none (coefficienti del RAW)
-    star_color: bool = True          # calibrazione dei colori sulle stelle a fine stack
+    star_color: bool = False          # calibrazione dei colori sulle stelle a fine stack
     landscape: bool = False          # paesaggio: primo piano riconosciuto e tenuto nitido
     align_model: str = "similarita"  # similarita | affine | omografia (grandangoli)
     keep_cache: bool = True          # tiene i frame calibrati per rifare lo stack in pochi secondi

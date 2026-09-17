@@ -1754,10 +1754,13 @@ class MainWindow(QMainWindow):
         try:
             from ..core.loader import load_frame
             fr = load_frame(path)
-            data = fr.data
+            data = fr.data.astype(np.float32, copy=True)
             if fr.is_bayer:
-                from ..core.calibration import to_rgb
-                data = to_rgb(data, True, fr.pattern)
+                from ..core import calibration as cal
+                wb = fr.meta.get("wb_camera") or fr.meta.get("wb_daylight")
+                if wb is not None:
+                    data = cal.apply_white_balance(data, True, fr.pattern, wb)
+                data = cal.to_rgb(data, True, fr.pattern)
             if data.ndim == 2:
                 data = np.repeat(data[:, :, None], 3, axis=2)
             data = np.ascontiguousarray(data[:, :, :3], dtype=np.float32)
@@ -1778,7 +1781,6 @@ class MainWindow(QMainWindow):
             self.editor_sidebar.clear_history()
         self.view.clear_annotations()
         self.tools.set_undo(False)
-        # FITS/RAW = dati lineari (da stirare); TIFF/PNG/JPG = già sviluppati.
         self.nonlinear = os.path.splitext(path)[1].lower() not in (
             ".fits", ".fit", ".fts", ".cr2", ".cr3", ".nef", ".arw", ".dng", ".raf", ".orf", ".rw2"
         )

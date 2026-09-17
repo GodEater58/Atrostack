@@ -539,83 +539,324 @@ def auto_tone(image: np.ndarray, p: DevelopParams, is_linear: bool = True) -> De
 
 
 def assisted_develop(image: np.ndarray, p: DevelopParams, is_linear: bool = True) -> tuple[DevelopParams, dict]:
-    """Costruisce una ricetta di sviluppo prudente e completamente modificabile.
+    """Costruisce una ricetta Assistita prudente e completamente modificabile.
 
-    Non usa un modello opaco: misura fondo, rumore, saturazione cromatica e
-    stelle, poi compila i normali parametri del pannello. Restituisce anche un
-    piccolo report per spiegare cosa è stato scelto.
+    La 1.4 tratta i gradienti estremi come potenziale paesaggio/orizzonte:
+    in quel caso non forza l'estrazione del fondo. Dopo l'auto-tone misura
+    anche quanto nero è stato introdotto e riapre le ombre se necessario.
     """
     q = DevelopParams.from_json(p.to_json())
     report: dict[str, float | int | str | bool] = {}
 
-    # Stretch protetto sulle immagini lineari.
+    # Stretch protetto sulle immagini lineari. Un valore negativo apre il
+    # taglio ombre invece di avvicinare il punto nero al fondo cielo.
     if is_linear:
         q.stretch_type = "masked"
         q.stretch_bg = 22.0
-        q.stretch_shadows = 8.0
+        q.stretch_shadows = -8.0
 
     src = image.astype(np.float32, copy=False)
-    # Analisi del gradiente sul dato di partenza: se è significativo lo propone
-    # nell'editor, ma con forza moderata per non mangiare nebulose estese.
+
+    # Analisi del gradiente. Un valore enorme è spesso causato da orizzonte,
+    # alberi, tetti o primo piano: in quel caso NON aumentiamo la correzione.
     try:
         from .gradient import fit_background
+
         _model, gi = fit_background(src, degree=2, grid=(10, 14))
-        report["gradient_strength"] = float(gi.strength)
+        strength = float(gi.strength)
+        report["gradient_strength"] = strength
         report["gradient_detected"] = bool(gi.detected)
-        if gi.detected:
-            q.gradient_correction = float(np.clip(55.0 + gi.strength * 80.0, 55.0, 90.0))
-            q.sky_neutralization = 70.0
+
+        if gi.detected and strength > 1.25:
+            report["gradient_reliable"] = False
+            report["scene_hint"] = "paesaggio/orizzonte probabile"
+            q.gradient_correction = 0.0
+            q.sky_neutralization = min(float(q.sky_neutralization), 15.0)
+
+        elif gi.detected:
+            report["gradient_reliable"] = True
+            q.gradient_correction = float(
+                np.clip(35.0 + strength * 45.0, 35.0, 70.0)
+            )
+            q.sky_neutralization = 45.0
+
     except Exception:
-        pass
+        report["gradient_reliable"] = False
 
     base = base_image(src, q, is_linear)
+
     if base.ndim == 2:
         base = np.repeat(base[:, :, None], 3, axis=2)
+
     L = np.clip(_lum(base), 0.0, 1.0)
     sub = L[::4, ::4]
-    hp = sub - cv2.GaussianBlur(np.ascontiguousarray(sub, np.float32), (0, 0), 1.2)
-    noise = 1.4826 * float(np.median(np.abs(hp - np.median(hp)))) + 1e-9
-    lo, med, hi = [float(v) for v in np.percentile(sub, [1.0, 50.0, 99.5])]
+
+    hp = sub - cv2.GaussianBlur(
+        np.ascontiguousarray(sub, np.float32),
+        (0, 0),
+        1.2,
+    )
+
+    noise = (
+        1.4826
+        * float(np.median(np.abs(hp - np.median(hp))))
+        + 1e-9
+    )
+
+    lo, med, hi = [
+        float(v)
+        for v in np.percentile(
+            sub,
+            [1.0, 50.0, 99.5],
+        )
+    ]
+
     dyn = max(hi - lo, 1e-6)
-    report.update({"noise": noise, "median": med, "dynamic_range": dyn})
 
-    # Denoise proporzionato al rumore, mantenendo le stelle protette.
-    q.nr_luminance = float(np.clip(8.0 + noise * 1300.0, 8.0, 48.0))
-    q.nr_color = float(np.clip(q.nr_luminance * 0.72, 6.0, 38.0))
-    q.star_protect = 72.0
+    baseline_black = float(np.mean(sub < 0.015))
+    baseline_deep = float(np.mean(sub < 0.035))
 
-    # Contrasto locale/dettaglio: conservativo sui dati rumorosi.
+    report.update(
+        {
+            "noise": noise,
+            "median": med,
+            "dynamic_range": dyn,
+            "baseline_black_fraction": baseline_black,
+            "baseline_deep_shadow_fraction": baseline_deep,
+        }
+    )
+
+    # Denoise moderato, mantenendo le stelle protette.
+    q.nr_luminance = float(
+        np.clip(6.0 + noise * 1050.0, 6.0, 38.0)
+    )
+    q.nr_color = float(
+        np.clip(q.nr_luminance * 0.68, 5.0, 30.0)
+    )
+    q.star_protect = 78.0
+
+    # Contrasto locale/dettaglio conservativo.
     snr_like = dyn / max(noise, 1e-6)
-    q.clarity = float(np.clip(8.0 + np.log10(max(snr_like, 1.0)) * 5.0, 8.0, 22.0))
-    q.dehaze = 7.0 if med < 0.45 else 4.0
-    q.wavelet_small = 4.0 if noise < 0.02 else 0.0
-    q.wavelet_medium = 8.0
-    q.wavelet_large = 3.0
 
-    # Colore: aumenta soprattutto le immagini poco sature, evitando l'effetto neon.
-    mx, mn = base.max(axis=2), base.min(axis=2)
+    q.clarity = float(
+        np.clip(
+            7.0
+            + np.log10(max(snr_like, 1.0))
+            * 4.0,
+            7.0,
+            18.0,
+        )
+    )
+
+    q.dehaze = 5.0 if med < 0.45 else 3.0
+    q.wavelet_small = 3.0 if noise < 0.02 else 0.0
+    q.wavelet_medium = 6.0
+    q.wavelet_large = 2.0
+
+    # Colore prudente: vividezza più che saturazione globale.
+    mx = base.max(axis=2)
+    mn = base.min(axis=2)
     sat = (mx - mn) / np.maximum(mx, 1e-4)
     sat_med = float(np.median(sat[::4, ::4]))
+
     report["median_saturation"] = sat_med
-    q.vibrance = float(np.clip(28.0 - 45.0 * sat_med, 8.0, 24.0))
-    q.saturation = 3.0 if sat_med < 0.25 else 0.0
+
+    q.vibrance = float(
+        np.clip(
+            24.0 - 38.0 * sat_med,
+            6.0,
+            20.0,
+        )
+    )
+    q.saturation = 2.0 if sat_med < 0.22 else 0.0
 
     # Stelle: stima FWHM e densità per sharpening/riduzione stelle.
     try:
         from .stars import detect_stars
-        sf = detect_stars(src if is_linear else base, max_stars=300, sigma=4.5)
+
+        sf = detect_stars(
+            src if is_linear else base,
+            max_stars=300,
+            sigma=4.5,
+        )
+
         report["stars"] = int(sf.n_detected)
         report["fwhm"] = float(sf.fwhm)
+
         if sf.fwhm > 0:
-            q.sharpen_radius = float(np.clip(sf.fwhm / 2.8, 0.8, 2.4))
-            q.sharpen = float(np.clip(20.0 - noise * 220.0, 8.0, 20.0))
-        density = sf.n_detected / max(base.shape[0] * base.shape[1] / 1_000_000.0, 0.1)
-        q.star_reduce = float(np.clip((density - 80.0) / 18.0, 0.0, 24.0))
+            q.sharpen_radius = float(
+                np.clip(
+                    sf.fwhm / 2.8,
+                    0.8,
+                    2.4,
+                )
+            )
+            q.sharpen = float(
+                np.clip(
+                    17.0 - noise * 190.0,
+                    7.0,
+                    17.0,
+                )
+            )
+
+        density = sf.n_detected / max(
+            base.shape[0]
+            * base.shape[1]
+            / 1_000_000.0,
+            0.1,
+        )
+
+        q.star_reduce = float(
+            np.clip(
+                (density - 90.0) / 22.0,
+                0.0,
+                18.0,
+            )
+        )
+
     except Exception:
         pass
 
-    # Chiude la ricetta con neri/bianchi robusti sul risultato proposto.
-    q = auto_tone(image, q, is_linear=is_linear)
+    # Auto-tone come rifinitura, non come strumento che può chiudere
+    # liberamente il punto nero.
+    q = auto_tone(
+        image,
+        q,
+        is_linear=is_linear,
+    )
+
+    # Protezione ombre 1.4:
+    # il risultato Assistito non deve introdurre molta più area quasi nera
+    # rispetto allo stretch di base. Il primo piano realmente nero resta nero,
+    # ma evitiamo di trasformare il cielo debole in nero puro.
+    try:
+        max_dim = 1200
+        ph, pw = image.shape[:2]
+
+        if max(ph, pw) > max_dim:
+            scale = max_dim / float(max(ph, pw))
+            preview_src = cv2.resize(
+                image,
+                (
+                    max(8, int(round(pw * scale))),
+                    max(8, int(round(ph * scale))),
+                ),
+                interpolation=cv2.INTER_AREA,
+            )
+        else:
+            preview_src = image
+
+        preview = develop(
+            preview_src,
+            q,
+            is_linear=is_linear,
+            scale=1.0,
+        )
+
+        if preview.ndim == 2:
+            preview = np.repeat(
+                preview[:, :, None],
+                3,
+                axis=2,
+            )
+
+        pL = np.clip(_lum(preview), 0.0, 1.0)
+
+        black_fraction = float(
+            np.mean(pL < 0.015)
+        )
+        deep_fraction = float(
+            np.mean(pL < 0.035)
+        )
+
+        allowed_black = min(
+            0.40,
+            max(
+                0.06,
+                baseline_black + 0.05,
+            ),
+        )
+
+        allowed_deep = min(
+            0.55,
+            max(
+                0.14,
+                baseline_deep + 0.08,
+            ),
+        )
+
+        report["assisted_black_fraction_before_guard"] = black_fraction
+        report["assisted_deep_shadow_fraction_before_guard"] = deep_fraction
+        report["allowed_black_fraction"] = allowed_black
+
+        if (
+            black_fraction > allowed_black
+            or deep_fraction > allowed_deep
+        ):
+            # Auto-tone non può più spingere i neri in modo aggressivo.
+            q.blacks = max(float(q.blacks), -2.0)
+            q.shadows = max(float(q.shadows), 18.0)
+
+            if is_linear:
+                q.stretch_shadows = min(
+                    float(q.stretch_shadows),
+                    -12.0,
+                )
+
+            preview = develop(
+                preview_src,
+                q,
+                is_linear=is_linear,
+                scale=1.0,
+            )
+
+            if preview.ndim == 2:
+                preview = np.repeat(
+                    preview[:, :, None],
+                    3,
+                    axis=2,
+                )
+
+            pL = np.clip(
+                _lum(preview),
+                0.0,
+                1.0,
+            )
+
+            black_fraction = float(
+                np.mean(pL < 0.015)
+            )
+
+            if black_fraction > allowed_black + 0.03:
+                q.blacks = max(
+                    float(q.blacks),
+                    0.0,
+                )
+                q.shadows = max(
+                    float(q.shadows),
+                    28.0,
+                )
+
+                if is_linear:
+                    q.stretch_shadows = min(
+                        float(q.stretch_shadows),
+                        -18.0,
+                    )
+
+                if med < 0.20:
+                    q.exposure = max(
+                        float(q.exposure),
+                        0.08,
+                    )
+
+            report["shadow_guard_applied"] = True
+
+        else:
+            report["shadow_guard_applied"] = False
+
+    except Exception:
+        report["shadow_guard_applied"] = False
+
     return q, report
 
 

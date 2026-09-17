@@ -158,21 +158,39 @@ def fit_background(img: np.ndarray, degree: int = 2, grid: tuple[int, int] = (16
 
 
 def remove_gradient(img: np.ndarray, degree: int = 2, force: bool = False):
-    """Sottrae il gradiente mantenendo il livello medio del fondo. Restituisce (img, info)."""
+    """Rimuove il gradiente solo quando il modello è abbastanza affidabile."""
     model, info = fit_background(img, degree)
+
     if model is None or (not info.detected and not force):
         return img, info
+
+    # Un gradiente enorme è spesso causato da orizzonte, alberi,
+    # edifici o primo piano scambiati per fondo cielo.
+    #
+    # In automatico è meglio NON alterare l'immagine.
+    if info.strength > 1.25 and not force:
+        info.applied = False
+        return img, info
+
     out = img.astype(np.float32, copy=True)
+
     if out.ndim == 2:
         out = out[:, :, None]
-    pedestal = np.median(model.reshape(-1, model.shape[2]), axis=0)
+
+    pedestal = np.median(
+        model.reshape(-1, model.shape[2]),
+        axis=0,
+    )
+
     out -= model
     out += pedestal[None, None, :]
+
     info.applied = True
+
     if img.ndim == 2:
         out = out[:, :, 0]
-    return out, info
 
+    return out, info
 
 def neutralize_background(img: np.ndarray) -> np.ndarray:
     """Porta il fondo cielo allo stesso livello nei tre canali (rimuove la dominante)."""
@@ -201,45 +219,182 @@ def background_levels(img: np.ndarray) -> np.ndarray:
     return np.median(sub[sel], axis=0) if sel.sum() > 100 else np.median(sub, axis=0)
 
 
-def color_calibrate_on_stars(img: np.ndarray, max_stars: int = 300, sat_level: float = 0.9):
-    """Riferimento bianco = colore medio delle stelle (come ColorCalibration di PixInsight
-    con "average spectral type" o la calibrazione manuale di Siril).
+def color_calibrate_on_stars(
+    img: np.ndarray,
+    max_stars: int = 300,
+    sat_level: float = 0.9,
+):
+    """Calibrazione cromatica stellare conservativa.
 
-    Il fondo viene mantenuto neutro: si scala solo il segnale sopra il fondo.
-    Restituisce (immagine, moltiplicatori (r, g, b), numero di stelle usate).
+    Il RAW ha già ricevuto un white balance. Questa funzione deve quindi
+    rifinire il colore, non reinventarlo.
     """
     from .stars import detect_stars
 
     if img.ndim != 3 or img.shape[2] != 3:
         return img, (1.0, 1.0, 1.0), 0
-    sf = detect_stars(img, max_stars=max_stars)
+
+    sf = detect_stars(
+        img,
+        max_stars=max_stars,
+    )
+
     bg = background_levels(img)
     H, W = img.shape[:2]
-    r_in, r_out = 5, 9
+
+    r_in = 5
+    r_out = 9
     ratios = []
+
     for x, y in sf.xy:
-        xi, yi = int(round(x)), int(round(y))
-        if xi - r_out < 0 or yi - r_out < 0 or xi + r_out + 1 > W or yi + r_out + 1 > H:
+        xi = int(round(x))
+        yi = int(round(y))
+
+        if (
+            xi - r_out < 0
+            or yi - r_out < 0
+            or xi + r_out + 1 > W
+            or yi + r_out + 1 > H
+        ):
             continue
-        box = img[yi - r_out:yi + r_out + 1, xi - r_out:xi + r_out + 1]
+
+        box = img[
+            yi - r_out : yi + r_out + 1,
+            xi - r_out : xi + r_out + 1,
+        ]
+
         if float(box.max()) >= sat_level:
             continue
-        ys, xs = np.mgrid[-r_out:r_out + 1, -r_out:r_out + 1]
+
+        ys, xs = np.mgrid[
+            -r_out : r_out + 1,
+            -r_out : r_out + 1,
+        ]
+
         d2 = xs * xs + ys * ys
+
         inner = d2 <= r_in * r_in
-        ring = (d2 > (r_in + 1) ** 2) & (d2 <= r_out * r_out)
-        local_bg = np.median(box[ring].reshape(-1, 3), axis=0)
-        flux = (box[inner].reshape(-1, 3) - local_bg).sum(axis=0)
-        if flux[1] <= 0 or flux[0] <= 0 or flux[2] <= 0:
+
+        ring = (
+            (d2 > (r_in + 1) ** 2)
+            & (d2 <= r_out * r_out)
+        )
+
+        local_bg = np.median(
+            box[ring].reshape(-1, 3),
+            axis=0,
+        )
+
+        flux = (
+            box[inner].reshape(-1, 3)
+            - local_bg
+        ).sum(axis=0)
+
+        if (
+            flux[0] <= 0
+            or flux[1] <= 0
+            or flux[2] <= 0
+        ):
             continue
-        ratios.append((flux[0] / flux[1], flux[2] / flux[1]))
-    if len(ratios) < 10:
+
+        ratios.append(
+            (
+                flux[0] / flux[1],
+                flux[2] / flux[1],
+            )
+        )
+
+    # Con poche stelle la misura non è abbastanza affidabile.
+    if len(ratios) < 20:
         return img, (1.0, 1.0, 1.0), len(ratios)
-    ratios = np.asarray(ratios)
-    mr, mb = float(np.median(ratios[:, 0])), float(np.median(ratios[:, 1]))
-    mult = (float(np.clip(1.0 / mr, 0.3, 4.0)), 1.0, float(np.clip(1.0 / mb, 0.3, 4.0)))
-    out = img.astype(np.float32, copy=True)
+
+    ratios = np.asarray(
+        ratios,
+        dtype=np.float64,
+    )
+
+    # Lavoriamo in log: è più corretto per rapporti cromatici.
+    log_r = np.log(
+        np.clip(ratios[:, 0], 1e-4, None)
+    )
+    log_b = np.log(
+        np.clip(ratios[:, 1], 1e-4, None)
+    )
+
+    med_r = np.median(log_r)
+    med_b = np.median(log_b)
+
+    mad_r = (
+        1.4826
+        * np.median(np.abs(log_r - med_r))
+        + 1e-9
+    )
+
+    mad_b = (
+        1.4826
+        * np.median(np.abs(log_b - med_b))
+        + 1e-9
+    )
+
+    good = (
+        (np.abs(log_r - med_r) < 2.5 * mad_r)
+        & (np.abs(log_b - med_b) < 2.5 * mad_b)
+    )
+
+    if int(good.sum()) < 15:
+        return img, (1.0, 1.0, 1.0), int(good.sum())
+
+    mr = float(
+        np.exp(np.median(log_r[good]))
+    )
+
+    mb = float(
+        np.exp(np.median(log_b[good]))
+    )
+
+    raw_r = 1.0 / max(mr, 1e-6)
+    raw_b = 1.0 / max(mb, 1e-6)
+
+    # Se servirebbe una correzione enorme, la misura non è affidabile.
+    if not (
+        0.60 <= raw_r <= 1.65
+        and 0.60 <= raw_b <= 1.65
+    ):
+        return img, (1.0, 1.0, 1.0), int(good.sum())
+
+    # Il RAW è già bilanciato: applichiamo solo una rifinitura.
+    strength = 0.35
+
+    r_mult = 1.0 + strength * (raw_r - 1.0)
+    b_mult = 1.0 + strength * (raw_b - 1.0)
+
+    # Limite duro: Auto stelle non può più produrre B ×1.78.
+    r_mult = float(
+        np.clip(r_mult, 0.82, 1.18)
+    )
+
+    b_mult = float(
+        np.clip(b_mult, 0.82, 1.18)
+    )
+
+    mult = (
+        r_mult,
+        1.0,
+        b_mult,
+    )
+
+    out = img.astype(
+        np.float32,
+        copy=True,
+    )
+
     pedestal = float(bg.mean())
+
     for c in range(3):
-        out[:, :, c] = (out[:, :, c] - bg[c]) * mult[c] + pedestal
-    return out, mult, len(ratios)
+        out[:, :, c] = (
+            (out[:, :, c] - bg[c])
+            * mult[c]
+            + pedestal
+        )
+
+    return out, mult, int(good.sum())
