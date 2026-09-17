@@ -37,7 +37,6 @@ jobs:
         run: |
           @'
           from pathlib import Path
-          import re
 
           root = Path("builder/app")
           mw_path = root / "astrostack/gui/main_window.py"
@@ -49,50 +48,69 @@ jobs:
           def patch(old, new, name):
               global s
               n = s.count(old)
+
               if n != 1:
                   raise RuntimeError(
                       f"Patch '{name}' non applicabile: trovate {n} occorrenze"
                   )
+
               s = s.replace(old, new, 1)
               print("OK:", name)
 
-          # ---------------------------------------------------------
-          # Stato UX 1.3 + recovery automatico
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # STATO UX 1.3 + AUTOSAVE / RECOVERY
+          # =========================================================
+
           patch(
           '''        TH.set_theme(str(qs.value("theme", "scuro")))
                   self._build_ui()
                   self._restore_geometry()
           ''',
           '''        TH.set_theme(str(qs.value("theme", "scuro")))
+
                   self.ui_mode = str(qs.value("ui_mode", "simple"))
+
                   if self.ui_mode not in ("simple", "advanced"):
                       self.ui_mode = "simple"
 
-                  recovery_base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+                  recovery_base = (
+                      os.environ.get("LOCALAPPDATA")
+                      or os.path.expanduser("~")
+                  )
+
                   self._recovery_path = os.path.join(
-                      recovery_base, "AstroStack", "recovery.astrostack"
+                      recovery_base,
+                      "AstroStack",
+                      "recovery.astrostack",
                   )
 
                   self._build_ui()
                   self._restore_geometry()
 
                   self._autosave_timer = QTimer(self)
-                  self._autosave_timer.setInterval(90000)
-                  self._autosave_timer.timeout.connect(self._autosave_recovery)
+                  self._autosave_timer.setInterval(120000)
+                  self._autosave_timer.timeout.connect(
+                      self._autosave_recovery
+                  )
                   self._autosave_timer.start()
           ''',
           "stato UX e autosave"
           )
 
+
           patch(
           '''        QTimer.singleShot(400, self._maybe_show_guide)
           ''',
           '''        QTimer.singleShot(300, self._startup_flow)
-                  QTimer.singleShot(15000, self._autosave_recovery)
+                  QTimer.singleShot(
+                      15000,
+                      self._autosave_recovery
+                  )
           ''',
           "startup 1.3"
           )
+
 
           patch(
           '''    def _maybe_show_guide(self):
@@ -102,27 +120,44 @@ jobs:
                   self._maybe_show_guide()
 
               def _maybe_offer_recovery(self):
-                  path = getattr(self, "_recovery_path", "")
+                  path = getattr(
+                      self,
+                      "_recovery_path",
+                      "",
+                  )
+
                   if not path or not os.path.isfile(path):
                       return
 
                   try:
-                      age = time.time() - os.path.getmtime(path)
+                      age = (
+                          time.time()
+                          - os.path.getmtime(path)
+                      )
+
                       if age > 7 * 24 * 3600:
                           os.remove(path)
                           return
+
                   except OSError:
                       return
 
                   r = QMessageBox.question(
                       self,
                       "Ripristino sessione",
-                      "AstroStack ha trovato una sessione non chiusa correttamente.\\n\\n"
+                      "AstroStack ha trovato una sessione "
+                      "non chiusa correttamente.\\n\\n"
                       "Vuoi ripristinarla?",
-                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                      QMessageBox.StandardButton.Yes
+                      | QMessageBox.StandardButton.No,
                   )
+
                   if r == QMessageBox.StandardButton.Yes:
-                      self.open_project(path=path, recovery=True)
+                      self.open_project(
+                          path=path,
+                          recovery=True,
+                      )
+
                   else:
                       try:
                           os.remove(path)
@@ -130,37 +165,67 @@ jobs:
                           pass
 
               def _autosave_recovery(self):
-                  if self.worker is not None and self.worker.isRunning():
+                  if (
+                      self.worker is not None
+                      and self.worker.isRunning()
+                  ):
                       return
 
-                  has_files = any(z.files for z in self.zones.values())
-                  if self.current_image is None and not has_files:
+                  has_files = any(
+                      z.files
+                      for z in self.zones.values()
+                  )
+
+                  if (
+                      self.current_image is None
+                      and not has_files
+                  ):
                       return
 
                   try:
                       os.makedirs(
-                          os.path.dirname(self._recovery_path),
+                          os.path.dirname(
+                              self._recovery_path
+                          ),
                           exist_ok=True,
                       )
+
                       project_io.save_project(
                           self._recovery_path,
-                          {k: list(z.files) for k, z in self.zones.items()},
-                          self.settings_panel.to_settings().__dict__,
+                          {
+                              k: list(z.files)
+                              for k, z
+                              in self.zones.items()
+                          },
+                          self.settings_panel
+                              .to_settings()
+                              .__dict__,
                           self.layers,
                           self.current_image,
                           not self.nonlinear,
                           self.opened_path,
                           self.annotations,
                           {
-                              "workspace": self.workspace,
-                              "ui_mode": self.ui_mode,
-                              "recovery": True,
+                              "workspace":
+                                  self.workspace,
+
+                              "ui_mode":
+                                  self.ui_mode,
+
+                              "recovery":
+                                  True,
+
                               "snapshots":
-                                  self.editor_sidebar.snapshots()
-                                  if hasattr(self, "editor_sidebar")
+                                  self.editor_sidebar
+                                      .snapshots()
+                                  if hasattr(
+                                      self,
+                                      "editor_sidebar",
+                                  )
                                   else [],
                           },
                       )
+
                   except Exception:
                       pass
 
@@ -169,9 +234,11 @@ jobs:
           "recovery"
           )
 
-          # ---------------------------------------------------------
-          # Home
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # HOME INIZIALE
+          # =========================================================
+
           patch(
           '''        root.addWidget(self.context_bar)
 
@@ -180,116 +247,209 @@ jobs:
           '''        root.addWidget(self.context_bar)
 
                   self.home_panel = QFrame()
-                  self.home_panel.setProperty("role", "panel")
+                  self.home_panel.setProperty(
+                      "role",
+                      "panel",
+                  )
 
-                  home = QVBoxLayout(self.home_panel)
-                  home.setContentsMargins(42, 38, 42, 38)
+                  home = QVBoxLayout(
+                      self.home_panel
+                  )
+
+                  home.setContentsMargins(
+                      42,
+                      38,
+                      42,
+                      38,
+                  )
+
                   home.setSpacing(14)
 
                   home.addStretch(1)
 
-                  home_title = QLabel("Benvenuto in AstroStack")
-                  home_title.setProperty("role", "title")
+                  home_title = QLabel(
+                      "Benvenuto in AstroStack"
+                  )
+
+                  home_title.setProperty(
+                      "role",
+                      "title",
+                  )
+
                   home.addWidget(home_title)
 
                   home_sub = QLabel(
-                      "Scegli cosa vuoi fare. Puoi creare uno stack oppure "
-                      "aprire direttamente una fotografia nell'Editor."
+                      "Scegli cosa vuoi fare. "
+                      "Puoi creare uno stack oppure "
+                      "aprire direttamente una fotografia "
+                      "nell'Editor."
                   )
-                  home_sub.setProperty("role", "muted")
-                  home_sub.setWordWrap(True)
-                  home.addWidget(home_sub)
 
+                  home_sub.setProperty(
+                      "role",
+                      "muted",
+                  )
+
+                  home_sub.setWordWrap(True)
+
+                  home.addWidget(home_sub)
                   home.addSpacing(10)
 
                   home_buttons = QHBoxLayout()
                   home_buttons.setSpacing(10)
 
                   self.btn_home_stack = AnimatedButton(
-                      "✦  Nuovo stack", "primary"
+                      "✦  Nuovo stack",
+                      "primary",
                   )
+
                   self.btn_home_editor = AnimatedButton(
                       "Apri nell'Editor…"
                   )
+
                   self.btn_home_project = AnimatedButton(
                       "Apri progetto…"
                   )
 
                   self.btn_home_stack.clicked.connect(
-                      lambda: self._set_workspace("stack")
+                      lambda:
+                          self._set_workspace("stack")
                   )
-                  self.btn_home_editor.clicked.connect(self._enter_editor)
-                  self.btn_home_project.clicked.connect(self.open_project)
 
-                  home_buttons.addWidget(self.btn_home_stack)
-                  home_buttons.addWidget(self.btn_home_editor)
-                  home_buttons.addWidget(self.btn_home_project)
+                  self.btn_home_editor.clicked.connect(
+                      self._enter_editor
+                  )
+
+                  self.btn_home_project.clicked.connect(
+                      self.open_project
+                  )
+
+                  home_buttons.addWidget(
+                      self.btn_home_stack
+                  )
+
+                  home_buttons.addWidget(
+                      self.btn_home_editor
+                  )
+
+                  home_buttons.addWidget(
+                      self.btn_home_project
+                  )
 
                   home.addLayout(home_buttons)
 
                   recent = str(
-                      QSettings("AstroStack", "AstroStack").value(
-                          "recent_project", ""
+                      QSettings(
+                          "AstroStack",
+                          "AstroStack",
+                      ).value(
+                          "recent_project",
+                          "",
                       ) or ""
                   )
 
                   self.btn_home_recent = AnimatedButton(
                       "Continua ultimo progetto"
                   )
+
                   self.btn_home_recent.setEnabled(
-                      bool(recent and os.path.isfile(recent))
+                      bool(
+                          recent
+                          and os.path.isfile(recent)
+                      )
                   )
+
                   self.btn_home_recent.clicked.connect(
-                      lambda: self.open_project(path=recent)
-                      if recent else None
+                      lambda:
+                          self.open_project(
+                              path=recent
+                          )
+                          if recent
+                          else None
                   )
-                  home.addWidget(self.btn_home_recent)
+
+                  home.addWidget(
+                      self.btn_home_recent
+                  )
 
                   hint = QLabel(
-                      "Suggerimento: puoi anche trascinare immagini o "
-                      "cartelle direttamente dentro AstroStack."
+                      "Suggerimento: puoi anche trascinare "
+                      "immagini o cartelle direttamente "
+                      "dentro AstroStack."
                   )
-                  hint.setProperty("role", "muted")
-                  hint.setWordWrap(True)
-                  home.addWidget(hint)
 
+                  hint.setProperty(
+                      "role",
+                      "muted",
+                  )
+
+                  hint.setWordWrap(True)
+
+                  home.addWidget(hint)
                   home.addStretch(2)
 
-                  root.addWidget(self.home_panel, 1)
+                  root.addWidget(
+                      self.home_panel,
+                      1,
+                  )
 
-                  split = QSplitter(Qt.Orientation.Horizontal)
+                  split = QSplitter(
+                      Qt.Orientation.Horizontal
+                  )
+
                   self.main_splitter = split
           ''',
           "Home"
           )
 
-          # ---------------------------------------------------------
-          # Pulsante Semplice / Avanzata
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # MODALITÀ SEMPLICE / AVANZATA
+          # =========================================================
+
           patch(
           '''        head.addSpacing(10)
                   self.lang_switch = LangSwitch(QSettings("AstroStack", "AstroStack").value("language", "it"))
           ''',
           '''        head.addSpacing(10)
 
-                  self.btn_ui_mode = AnimatedButton("Semplice")
-                  self.btn_ui_mode.setToolTip(
-                      "Alterna tra i controlli essenziali e tutti "
-                      "gli strumenti avanzati."
+                  self.btn_ui_mode = AnimatedButton(
+                      "Semplice"
                   )
-                  self.btn_ui_mode.clicked.connect(self.toggle_ui_mode)
-                  head.addWidget(self.btn_ui_mode)
 
-                  self.lang_switch = LangSwitch(QSettings("AstroStack", "AstroStack").value("language", "it"))
+                  self.btn_ui_mode.setToolTip(
+                      "Alterna tra i controlli essenziali "
+                      "e tutti gli strumenti avanzati."
+                  )
+
+                  self.btn_ui_mode.clicked.connect(
+                      self.toggle_ui_mode
+                  )
+
+                  head.addWidget(
+                      self.btn_ui_mode
+                  )
+
+                  self.lang_switch = LangSwitch(
+                      QSettings(
+                          "AstroStack",
+                          "AstroStack",
+                      ).value(
+                          "language",
+                          "it",
+                      )
+                  )
           ''',
           "pulsante semplice avanzata"
           )
+
 
           patch(
           '''        self.setAcceptDrops(True)
                   self._set_workspace("stack")
           ''',
           '''        self.setAcceptDrops(True)
+
                   self._set_workspace("stack")
                   self._apply_ui_mode()
                   self._show_home()
@@ -297,24 +457,48 @@ jobs:
           "home startup"
           )
 
+
           patch(
           '''    def _enter_editor(self):
           ''',
           '''    def _show_home(self):
-                  if not hasattr(self, "home_panel"):
+                  if not hasattr(
+                      self,
+                      "home_panel",
+                  ):
                       return
+
                   self.home_panel.show()
-                  if hasattr(self, "main_splitter"):
+
+                  if hasattr(
+                      self,
+                      "main_splitter",
+                  ):
                       self.main_splitter.hide()
-                  if hasattr(self, "context_bar"):
+
+                  if hasattr(
+                      self,
+                      "context_bar",
+                  ):
                       self.context_bar.hide()
 
               def _leave_home(self):
-                  if hasattr(self, "home_panel"):
+                  if hasattr(
+                      self,
+                      "home_panel",
+                  ):
                       self.home_panel.hide()
-                  if hasattr(self, "main_splitter"):
+
+                  if hasattr(
+                      self,
+                      "main_splitter",
+                  ):
                       self.main_splitter.show()
-                  if hasattr(self, "context_bar"):
+
+                  if hasattr(
+                      self,
+                      "context_bar",
+                  ):
                       self.context_bar.show()
 
               def toggle_ui_mode(self):
@@ -323,9 +507,14 @@ jobs:
                       if self.ui_mode == "simple"
                       else "simple"
                   )
+
                   QSettings(
-                      "AstroStack", "AstroStack"
-                  ).setValue("ui_mode", self.ui_mode)
+                      "AstroStack",
+                      "AstroStack",
+                  ).setValue(
+                      "ui_mode",
+                      self.ui_mode,
+                  )
 
                   self._apply_ui_mode()
 
@@ -336,22 +525,49 @@ jobs:
                   )
 
               def _apply_ui_mode(self):
-                  advanced = self.ui_mode == "advanced"
+                  advanced = (
+                      self.ui_mode == "advanced"
+                  )
 
-                  if hasattr(self, "btn_ui_mode"):
+                  if hasattr(
+                      self,
+                      "btn_ui_mode",
+                  ):
                       self.btn_ui_mode.setText(
-                          "Avanzata" if advanced else "Semplice"
+                          "Avanzata"
+                          if advanced
+                          else "Semplice"
                       )
 
-                  if hasattr(self, "settings_panel"):
-                      self.settings_panel.adv_btn.setVisible(advanced)
-                      if not advanced:
-                          self.settings_panel.adv.hide()
+                  if hasattr(
+                      self,
+                      "settings_panel",
+                  ):
+                      self.settings_panel.adv_btn.setVisible(
+                          advanced
+                      )
 
-                  if hasattr(self, "tools"):
-                      self.tools.setVisible(advanced)
+                      if hasattr(
+                          self.settings_panel,
+                          "_collapser",
+                      ):
+                          self.settings_panel \
+                              ._collapser \
+                              .setVisible(
+                                  advanced
+                              )
 
-                  editor = self.workspace == "editor"
+                  if hasattr(
+                      self,
+                      "tools",
+                  ):
+                      self.tools.setVisible(
+                          advanced
+                      )
+
+                  editor = (
+                      self.workspace == "editor"
+                  )
 
                   for name in (
                       "btn_sort",
@@ -361,35 +577,89 @@ jobs:
                       "btn_frames",
                       "btn_log",
                   ):
-                      w = getattr(self, name, None)
-                      if w is not None:
-                          w.setVisible(advanced and not editor)
-
-                  if hasattr(self, "btn_restack"):
-                      self.btn_restack.setVisible(
-                          advanced and not editor
+                      w = getattr(
+                          self,
+                          name,
+                          None,
                       )
 
-                  if hasattr(self, "btn_layers"):
-                      self.btn_layers.setVisible(advanced)
+                      if w is not None:
+                          w.setVisible(
+                              advanced
+                              and not editor
+                          )
+
+                  if hasattr(
+                      self,
+                      "btn_restack",
+                  ):
+                      self.btn_restack.setVisible(
+                          advanced
+                          and not editor
+                      )
+
+                  if hasattr(
+                      self,
+                      "btn_layers",
+                  ):
+                      self.btn_layers.setVisible(
+                          advanced
+                      )
+
+                  if (
+                      not advanced
+                      and hasattr(
+                          self,
+                          "dock_layers",
+                      )
+                  ):
+                      self.dock_layers.hide()
+
+                  if (
+                      not advanced
+                      and hasattr(
+                          self,
+                          "dock_log",
+                      )
+                  ):
+                      self.dock_log.hide()
+
+                  if (
+                      not advanced
+                      and hasattr(
+                          self,
+                          "dock_frames",
+                      )
+                  ):
+                      self.dock_frames.hide()
 
               def _enter_editor(self):
           ''',
           "metodi home e modalità"
           )
 
+
           patch(
           '''        mode = "editor" if mode == "editor" else "stack"
                   self.workspace = mode
           ''',
-          '''        if hasattr(self, "home_panel"):
+          '''        if hasattr(
+                      self,
+                      "home_panel",
+                  ):
                       self._leave_home()
 
-                  mode = "editor" if mode == "editor" else "stack"
+                  mode = (
+                      "editor"
+                      if mode == "editor"
+                      else "stack"
+                  )
+
                   self.workspace = mode
           ''',
           "uscita Home"
           )
+
 
           patch(
           '''            elif self.current_image is None:
@@ -398,7 +668,10 @@ jobs:
               def _apply_editor_preset(self, key: str):
           ''',
           '''            elif self.current_image is None:
-                      self.preview_label.setText("Nessuna anteprima: carica i light e premi Stack.")
+                      self.preview_label.setText(
+                          "Nessuna anteprima: "
+                          "carica i light e premi Stack."
+                      )
 
                   self._apply_ui_mode()
 
@@ -407,16 +680,21 @@ jobs:
           "applica modalità al workspace"
           )
 
-          # ---------------------------------------------------------
-          # Preset astrofotografici aggiuntivi
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # PRESET PER SOGGETTO
+          # =========================================================
+
           patch(
           '''        if key == "natural":
                       p.vibrance, p.clarity = 8.0, 5.0
                   elif key == "contrast":
           ''',
           '''        if key == "natural":
-                      p.vibrance, p.clarity = 8.0, 5.0
+                      p.vibrance, p.clarity = (
+                          8.0,
+                          5.0,
+                      )
 
                   elif key == "galaxy":
                       p.contrast = 18.0
@@ -458,21 +736,36 @@ jobs:
           "preset soggetti"
           )
 
-          # ---------------------------------------------------------
-          # Progetto recente + recovery
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # PROGETTO RECENTE
+          # =========================================================
+
           patch(
           '''            self.project_path = path
                       self.status.setText(f"Progetto salvato: {path}")
           ''',
           '''            self.project_path = path
+
                       QSettings(
-                          "AstroStack", "AstroStack"
-                      ).setValue("recent_project", path)
-                      self.status.setText(f"Progetto salvato: {path}")
+                          "AstroStack",
+                          "AstroStack",
+                      ).setValue(
+                          "recent_project",
+                          path,
+                      )
+
+                      self.status.setText(
+                          f"Progetto salvato: {path}"
+                      )
           ''',
           "progetto recente salvataggio"
           )
+
+
+          # =========================================================
+          # APERTURA PROGETTO + RECOVERY
+          # =========================================================
 
           patch(
           '''    def open_project(self):
@@ -488,7 +781,10 @@ jobs:
                   path: Optional[str] = None,
                   recovery: bool = False,
               ):
-                  if self.worker is not None and self.worker.isRunning():
+                  if (
+                      self.worker is not None
+                      and self.worker.isRunning()
+                  ):
                       return
 
                   if not path:
@@ -496,23 +792,34 @@ jobs:
                           self,
                           tr("Apri progetto"),
                           "",
-                          tr("Progetto AstroStack (*.astrostack)")
+                          tr(
+                              "Progetto AstroStack "
+                              "(*.astrostack)"
+                          ),
                       )
+
                       if not path:
                           return
           ''',
           "open_project recovery"
           )
 
+
           patch(
           '''        self.project_path = path
                   for k, z in self.zones.items():
           ''',
-          '''        self.project_path = None if recovery else path
+          '''        self.project_path = (
+                      None
+                      if recovery
+                      else path
+                  )
+
                   for k, z in self.zones.items():
           ''',
           "project path recovery"
           )
+
 
           patch(
           '''        self._set_workspace(preferred)
@@ -522,48 +829,93 @@ jobs:
           '''        self._set_workspace(preferred)
 
                   if recovery:
-                      self.status.setText("Sessione ripristinata automaticamente.")
-                      self.status.setStyleSheet(f"color: {TH.OK};")
-                      self.toast.show_message("Sessione precedente ripristinata")
+                      self.status.setText(
+                          "Sessione ripristinata "
+                          "automaticamente."
+                      )
+
+                      self.status.setStyleSheet(
+                          f"color: {TH.OK};"
+                      )
+
+                      self.toast.show_message(
+                          "Sessione precedente "
+                          "ripristinata"
+                      )
+
                   else:
                       QSettings(
-                          "AstroStack", "AstroStack"
-                      ).setValue("recent_project", path)
+                          "AstroStack",
+                          "AstroStack",
+                      ).setValue(
+                          "recent_project",
+                          path,
+                      )
 
               # ------------------------------------------------------------ smistamento
           ''',
           "fine apertura progetto"
           )
 
-          # ---------------------------------------------------------
-          # Riepilogo finale stack
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # RIEPILOGO FINALE STACK
+          # =========================================================
+
           patch(
           '''        if getattr(self, "_batch_folder", ""):
                       self._batch_finish_one()
 
               def _on_failed(self, msg: str):
           ''',
-          '''        if getattr(self, "_batch_folder", ""):
+          '''        if getattr(
+                      self,
+                      "_batch_folder",
+                      "",
+                  ):
                       self._batch_finish_one()
+
                   else:
                       self._show_stack_summary(res)
 
-              def _show_stack_summary(self, res: StackResult):
+              def _show_stack_summary(
+                  self,
+                  res: StackResult,
+              ):
                   total = len(res.frames)
                   used = int(res.n_used)
-                  rejected = max(0, total - used)
 
-                  settings = self.settings_panel.to_settings()
+                  rejected = max(
+                      0,
+                      total - used,
+                  )
+
+                  settings = (
+                      self.settings_panel
+                      .to_settings()
+                  )
 
                   methods = {
-                      "auto": "Automatico",
-                      "sigma": "Kappa-sigma",
-                      "winsor": "Sigma winsorizzato",
-                      "linearfit": "Linear-fit clipping",
-                      "mediana": "Mediana",
-                      "media": "Media",
-                      "scie": "Scie stellari",
+                      "auto":
+                          "Automatico",
+
+                      "sigma":
+                          "Kappa-sigma",
+
+                      "winsor":
+                          "Sigma winsorizzato",
+
+                      "linearfit":
+                          "Linear-fit clipping",
+
+                      "mediana":
+                          "Mediana",
+
+                      "media":
+                          "Media",
+
+                      "scie":
+                          "Scie stellari",
                   }
 
                   text = (
@@ -571,33 +923,52 @@ jobs:
                       f"Frame utilizzati: {used}\\n"
                       f"Frame esclusi: {rejected}\\n"
                       f"Tempo: {res.elapsed:.0f} s\\n"
-                      f"Metodo: {methods.get(settings.method, settings.method)}\\n"
+                      f"Metodo: "
+                      f"{methods.get(settings.method, settings.method)}\\n"
                       f"Drizzle: {settings.drizzle}×\\n"
-                      f"Gradiente: {res.gradient.describe()}"
+                      f"Gradiente: "
+                      f"{res.gradient.describe()}"
                   )
 
                   box = QMessageBox(self)
-                  box.setWindowTitle("Stack completato")
-                  box.setIcon(QMessageBox.Icon.Information)
-                  box.setText("Stack completato con successo")
+
+                  box.setWindowTitle(
+                      "Stack completato"
+                  )
+
+                  box.setIcon(
+                      QMessageBox.Icon.Information
+                  )
+
+                  box.setText(
+                      "Stack completato con successo"
+                  )
+
                   box.setInformativeText(text)
 
                   btn_editor = box.addButton(
                       "Apri nell'Editor",
                       QMessageBox.ButtonRole.ActionRole,
                   )
+
                   btn_export = box.addButton(
                       "Esporta…",
                       QMessageBox.ButtonRole.ActionRole,
                   )
-                  box.addButton(QMessageBox.StandardButton.Close)
+
+                  box.addButton(
+                      QMessageBox.StandardButton.Close
+                  )
 
                   box.exec()
 
                   clicked = box.clickedButton()
 
                   if clicked is btn_editor:
-                      self._set_workspace("editor")
+                      self._set_workspace(
+                          "editor"
+                      )
+
                   elif clicked is btn_export:
                       self.save_result()
 
@@ -606,9 +977,11 @@ jobs:
           "riepilogo stack"
           )
 
-          # ---------------------------------------------------------
-          # Cancella recovery alla chiusura corretta
-          # ---------------------------------------------------------
+
+          # =========================================================
+          # RECOVERY: CANCELLA ALLA CHIUSURA CORRETTA
+          # =========================================================
+
           patch(
           '''        if self.result is not None:
                       self.result.cleanup()
@@ -618,8 +991,13 @@ jobs:
                       self.result.cleanup()
 
                   try:
-                      if os.path.isfile(self._recovery_path):
-                          os.remove(self._recovery_path)
+                      if os.path.isfile(
+                          self._recovery_path
+                      ):
+                          os.remove(
+                              self._recovery_path
+                          )
+
                   except OSError:
                       pass
 
@@ -628,12 +1006,21 @@ jobs:
           "cleanup recovery"
           )
 
-          mw_path.write_text(s, encoding="utf-8")
 
-          # ---------------------------------------------------------
-          # EditorSidebar - preset per soggetto
-          # ---------------------------------------------------------
-          es = es_path.read_text(encoding="utf-8")
+          mw_path.write_text(
+              s,
+              encoding="utf-8",
+          )
+
+
+          # =========================================================
+          # EDITOR SIDEBAR - PRESET PER SOGGETTO
+          # =========================================================
+
+          es = es_path.read_text(
+              encoding="utf-8"
+          )
+
 
           old_presets = '''    PRESETS = (
                   ("natural", "Naturale"),
@@ -644,6 +1031,7 @@ jobs:
                   ("mono", "Mono / Ha"),
               )
           '''
+
 
           new_presets = '''    PRESETS = (
                   ("natural", "Naturale"),
@@ -659,32 +1047,91 @@ jobs:
               )
           '''
 
+
           if old_presets not in es:
-              raise RuntimeError("PRESETS EditorSidebar non trovato")
-
-          es = es.replace(old_presets, new_presets, 1)
-          es_path.write_text(es, encoding="utf-8")
-          print("OK: preset EditorSidebar")
-
-          # ---------------------------------------------------------
-          # Versione 1.3
-          # ---------------------------------------------------------
-          if ver_path.exists():
-              version = ver_path.read_text(encoding="utf-8")
-              version, n = re.subn(
-                  r'__version__\\s*=\\s*["\\'][^"\\']+["\\']',
-                  '__version__ = "1.3.0-preview"',
-                  version,
-                  count=1,
+              raise RuntimeError(
+                  "PRESETS EditorSidebar non trovato"
               )
-              if n:
-                  ver_path.write_text(version, encoding="utf-8")
-                  print("OK: versione 1.3.0-preview")
-              else:
-                  print("ATTENZIONE: __version__ non trovato")
 
-          print("Patch AstroStack 1.3 completata.")
-          '@ | Set-Content -Path ".\patch_v13.py" -Encoding UTF8
+
+          es = es.replace(
+              old_presets,
+              new_presets,
+              1,
+          )
+
+
+          es_path.write_text(
+              es,
+              encoding="utf-8",
+          )
+
+          print(
+              "OK: preset EditorSidebar"
+          )
+
+
+          # =========================================================
+          # VERSIONE 1.3
+          # NIENTE REGEX: MODIFICA ROBUSTA RIGA PER RIGA
+          # =========================================================
+
+          if ver_path.exists():
+              version_text = ver_path.read_text(
+                  encoding="utf-8"
+              )
+
+              lines = version_text.splitlines()
+
+              version_found = False
+
+              for i, line in enumerate(lines):
+                  stripped = line.strip()
+
+                  if stripped.startswith(
+                      "__version__"
+                  ):
+                      indent = line[
+                          :len(line)
+                          - len(line.lstrip())
+                      ]
+
+                      lines[i] = (
+                          indent
+                          + '__version__ = "1.3.0-preview"'
+                      )
+
+                      version_found = True
+                      break
+
+              if not version_found:
+                  raise RuntimeError(
+                      "__version__ non trovato "
+                      "in astrostack/__init__.py"
+                  )
+
+              ver_path.write_text(
+                  "\n".join(lines) + "\n",
+                  encoding="utf-8",
+              )
+
+              print(
+                  "OK: versione 1.3.0-preview"
+              )
+
+          else:
+              raise RuntimeError(
+                  "astrostack/__init__.py "
+                  "non trovato"
+              )
+
+
+          print(
+              "Patch AstroStack 1.3 completata."
+          )
+          '@ | Set-Content `
+            -Path ".\patch_v13.py" `
+            -Encoding UTF8
 
           python ".\patch_v13.py"
 
@@ -693,13 +1140,24 @@ jobs:
         run: |
           python -m py_compile `
             ".\builder\app\astrostack\gui\main_window.py" `
-            ".\builder\app\astrostack\gui\editor_sidebar.py"
+            ".\builder\app\astrostack\gui\editor_sidebar.py" `
+            ".\builder\app\astrostack\gui\settings_panel.py" `
+            ".\builder\app\astrostack\__init__.py"
 
       - name: Pubblica sorgenti UI 1.3
         shell: powershell
         run: |
-          Remove-Item ".\ui-source-v1.3" -Recurse -Force -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path ".\ui-source-v1.3" | Out-Null
+          Remove-Item `
+            ".\ui-source-v1.3" `
+            -Recurse `
+            -Force `
+            -ErrorAction SilentlyContinue
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path ".\ui-source-v1.3" |
+            Out-Null
 
           Copy-Item `
             ".\builder\app\astrostack\gui\*.py" `
@@ -711,16 +1169,27 @@ jobs:
             ".\ui-source-v1.3\package-init.py" `
             -Force
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config `
+            user.name `
+            "github-actions[bot]"
+
+          git config `
+            user.email `
+            "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add ui-source-v1.3
 
           $changes = git status --porcelain
 
           if ($changes) {
-            git commit -m "AstroStack 1.3 UX preview sources"
+            git commit `
+              -m "AstroStack 1.3 UX preview sources"
+
             git push
+          }
+          else {
+            Write-Host `
+              "Sorgenti 1.3 già aggiornati."
           }
 
       - name: Setup Go
@@ -732,22 +1201,28 @@ jobs:
         shell: powershell
         run: |
           Push-Location ".\builder\launcher"
+
           if (-not (Test-Path "go.mod")) {
             go mod init astrostack-launcher
           }
+
           Pop-Location
 
           Push-Location ".\builder\setup"
+
           if (-not (Test-Path "go.mod")) {
             go mod init astrostack-setup
           }
+
           Pop-Location
 
       - name: Build AstroStack 1.3 Offline
         shell: powershell
         run: |
           Set-Location ".\builder"
-          .\build_offline.ps1 -Version "1.3.0_preview"
+
+          .\build_offline.ps1 `
+            -Version "1.3.0_preview"
 
       - name: Upload AstroStack 1.3
         uses: actions/upload-artifact@v4
