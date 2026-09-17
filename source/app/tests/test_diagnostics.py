@@ -41,9 +41,12 @@ def main() -> int:
         assert "RuntimeError: diagnostics smoke test" in crash
         assert "AstroStack crash report" in crash
 
-        log_dir = Path(td) / "logs"
-        assert startup.parent == log_dir
-        assert report.parent == log_dir
+        # Windows can expose the temporary directory through an alias/short path
+        # while Path.resolve() returns its canonical form. Compare canonical paths
+        # so the test validates the destination rather than the string spelling.
+        log_dir = (Path(td) / "logs").resolve()
+        assert startup.parent.resolve() == log_dir
+        assert report.parent.resolve() == log_dir
 
     print("ASTROSTACK_DIAGNOSTICS_OK")
     return 0
