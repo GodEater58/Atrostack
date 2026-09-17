@@ -1,0 +1,10 @@
+# AstroStack — dipendenze (Python 3.10 - 3.14)
+numpy>=1.26
+scipy>=1.11
+opencv-python>=4.8,<5   # versione testata: 4.13
+rawpy>=0.21          # LibRaw: tutti i RAW (CR2, CR3, NEF, ARW, DNG, ...)
+tifffile>=2023.7
+astropy>=5.3         # FITS
+exifread>=3.0        # tempo di posa / ISO dai RAW
+PySide6>=6.6
+requests>=2.28      # riconoscimento oggetti con nova.astrometry.net
