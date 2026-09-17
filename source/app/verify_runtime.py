@@ -9,5 +9,5 @@ assert pathlib.Path(sys.executable).resolve().parent == root / "runtime"
 assert sys.flags.isolated and sys.flags.ignore_environment
 for module in (numpy, scipy, cv2, rawpy, tifffile, astropy, exifread, PySide6, requests):
     assert pathlib.Path(module.__file__).resolve().is_relative_to(root / "runtime"), module.__name__
-assert __version__ == "1.3.2-preview"
+assert __version__ == "1.4.0-preview"
 print("ASTROSTACK_PRIVATE_RUNTIME_OK")
