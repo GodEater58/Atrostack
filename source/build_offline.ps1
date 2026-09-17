@@ -1,4 +1,4 @@
-param([string]$Version = '1.3.2_preview')
+param([string]$Version = '1.4.0_preview')
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Build = Join-Path $Root 'build'
