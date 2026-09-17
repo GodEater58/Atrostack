@@ -10,6 +10,13 @@ import sys
 # esegui anche da una cartella diversa
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Installa il crash logger il prima possibile: funziona anche se Qt non
+# riesce ancora ad avviarsi.
+from astrostack.diagnostics import install_exception_handler, record_startup
+
+install_exception_handler()
+record_startup()
+
 
 def main() -> int:
     from PySide6.QtCore import Qt
@@ -27,6 +34,11 @@ def main() -> int:
     app.setApplicationName("AstroStack")
     app.setOrganizationName("AstroStack")
     app.setStyle("Fusion")
+
+    # Aggancia il gestore anche alla fase GUI: in caso di errore l'utente
+    # riceve un messaggio con il percorso del report locale.
+    install_exception_handler(app)
+
     app.setPalette(dark_palette())
     family = load_fonts()
     app.setFont(QFont(family, 10))
@@ -40,7 +52,7 @@ def main() -> int:
     startup_project = None
     if len(sys.argv) > 1:
         candidate = os.path.abspath(sys.argv[1])
-        if candidate.lower().endswith('.astrostack') and os.path.isfile(candidate):
+        if candidate.lower().endswith(".astrostack") and os.path.isfile(candidate):
             startup_project = candidate
 
     win.setWindowOpacity(0.0)
