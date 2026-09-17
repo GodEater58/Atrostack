@@ -19,6 +19,7 @@ def main() -> int:
     from PySide6.QtGui import QIcon
 
     from astrostack.gui.main_window import MainWindow
+    from astrostack.gui.ux_v13 import install as install_ux_v13
     from astrostack.gui.theme import build_stylesheet, dark_palette, load_fonts
 
     QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
@@ -34,6 +35,7 @@ def main() -> int:
     if os.path.isfile(icon):
         app.setWindowIcon(QIcon(icon))
     win = MainWindow()
+    install_ux_v13(win)
     win.setWindowOpacity(0.0)
     win.show()
     from PySide6.QtCore import QEasingCurve, QPropertyAnimation
