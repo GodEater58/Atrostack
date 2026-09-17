@@ -126,6 +126,43 @@ def write_crash_report(exc_type, exc_value, exc_tb) -> Path | None:
         return None
 
 
+
+def latest_crash_report() -> Path | None:
+    """Restituisce il crash report più recente, se presente."""
+    try:
+        reports = sorted(
+            logs_dir().glob("crash_*.txt"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        return reports[0] if reports else None
+    except OSError:
+        return None
+
+
+def system_info_text() -> str:
+    """Informazioni tecniche pronte da copiare in una segnalazione."""
+    now = _dt.datetime.now().astimezone().isoformat(timespec="seconds")
+    lines = [
+        "AstroStack diagnostics",
+        f"Version: {_safe_version()}",
+        f"Time: {now}",
+        f"OS: {platform.platform()}",
+        f"Machine: {platform.machine()}",
+        f"Python: {sys.version.replace(chr(10), ' ')}",
+        f"Executable: {sys.executable}",
+        f"Data directory: {data_root()}",
+        f"Log directory: {logs_dir()}",
+    ]
+
+    try:
+        from PySide6 import __version__ as qt_version
+        lines.append(f"PySide6: {qt_version}")
+    except Exception:
+        lines.append("PySide6: unavailable")
+
+    return "\n".join(lines) + "\n"
+
 def _show_crash_dialog(path: Path | None, exc_value) -> None:
     # Non importare PySide6 a livello modulo: il logger deve funzionare anche
     # se proprio Qt è la causa del mancato avvio.

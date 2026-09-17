@@ -1,2 +1,2 @@
 """AstroStack."""
-__version__ = "1.3.2-preview"
+__version__ = "1.3.3-preview"

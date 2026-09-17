@@ -27,6 +27,7 @@ from ..core.pipeline import Settings, StackResult
 from . import theme as TH
 from .i18n import tr
 from .widgets import AnimatedButton
+from .about_dialog import AboutDiagnosticsDialog
 
 
 PRESETS = (
@@ -74,6 +75,7 @@ def install(window):
 
     _install_home(window)
     _install_mode_button(window)
+    _install_about_button(window)
     _wrap_workspace(window)
     _install_presets(window)
     _install_projects(window)
@@ -347,6 +349,32 @@ def _install_mode_button(window):
             index,
             button,
         )
+
+
+def _install_about_button(window):
+    """Aggiunge l'accesso a Informazioni/Diagnostica nella barra superiore."""
+    root = _main_layout(window)
+    head = root.itemAt(0).layout()
+    if head is None:
+        return
+
+    button = AnimatedButton("Info")
+    button.setToolTip(
+        "Informazioni su AstroStack e strumenti di diagnostica."
+    )
+
+    def show_about():
+        dialog = AboutDiagnosticsDialog(window)
+        dialog.exec()
+
+    button.clicked.connect(show_about)
+    window.btn_about = button
+
+    index = head.indexOf(window.lang_switch)
+    if index < 0:
+        head.addWidget(button)
+    else:
+        head.insertWidget(index, button)
 
 
 def _toggle_ui_mode(window):
