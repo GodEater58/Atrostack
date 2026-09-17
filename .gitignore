@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build
+build/
+dist/
+*.spec
+
+# Logs / crash reports
+*.log
+logs/
+crash_*.txt
+last_startup.txt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary
+*.tmp
+*.bak
+*.swp
+
+# Local patches / archives
+*.patch
+*.zip
+
+# AstroStack local runtime/build artifacts
+source/build/
+source/setup/payload.zip
+source/setup/wheelhouse.zip
+source/AstroStack_Setup_Offline_*.exe
+source/AstroStack_Setup_Offline_*.sha256.txt
