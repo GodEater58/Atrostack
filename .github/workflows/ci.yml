@@ -1,0 +1,65 @@
+name: AstroStack CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'source/app/**'
+      - '.github/workflows/ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'source/app/**'
+      - '.github/workflows/ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    env:
+      PYTHONPATH: ${{ github.workspace }}\source\app
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: source/app/requirements.txt
+
+      - name: Install dependencies
+        shell: pwsh
+        run: python -m pip install -r source/app/requirements.txt
+
+      - name: Compile Python sources
+        shell: pwsh
+        run: python -m compileall -q source/app/astrostack source/app/main.py
+
+      - name: Diagnostics test
+        shell: pwsh
+        run: python source/app/tests/test_diagnostics.py
+
+      - name: Editor and stack regression
+        shell: pwsh
+        run: python source/app/tests/regression_editor_stack_v12.py
+
+      - name: Live and drizzle regression
+        shell: pwsh
+        run: python source/app/tests/regression_live_drizzle.py
+
+      - name: Synthetic end-to-end test
+        shell: pwsh
+        run: python source/app/tests/synthetic_test.py
+
+      - name: GUI smoke test
+        shell: pwsh
+        run: python source/app/tests/smoke_gui.py
