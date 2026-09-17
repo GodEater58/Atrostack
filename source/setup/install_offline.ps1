@@ -7,7 +7,7 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $ErrorActionPreference = 'Stop'
-$Version = '1.3.2-preview-offline'
+$Version = '1.4.0-preview-offline'
 $InstallDir = Join-Path $env:LOCALAPPDATA 'Programs\AstroStack'
 $RuntimeDir = Join-Path $InstallDir 'runtime'
 $StartMenuDir = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\AstroStack'
@@ -31,7 +31,7 @@ if (-not $Silent) {
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TextBlock Text="AstroStack 1.3.2 Preview" FontSize="25" FontWeight="SemiBold"/>
+    <TextBlock Text="AstroStack 1.4.0 Preview" FontSize="25" FontWeight="SemiBold"/>
     <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="Installazione offline completa · nessuna connessione richiesta" Foreground="#8FA7C2" FontSize="13"/>
     <ProgressBar Name="Bar" Grid.Row="2" Margin="0,26,0,0" Height="16" Minimum="0" Maximum="100" Value="2"/>
     <TextBlock Name="Status" Grid.Row="3" Margin="0,18,0,0" Text="Preparazione…" TextWrapping="Wrap" FontSize="13"/>
@@ -77,7 +77,6 @@ function Install-AstroStack {
         if (-not (Test-Path -LiteralPath $python)) { throw 'Runtime privato assente nel pacchetto.' }
         Set-Stage 'Verifico il runtime e le librerie incluse...' 70
         Run-Process $python @(('"' + (Join-Path $StagingDir 'app\verify_runtime.py') + '"'))
-        # Replace only our fixed application directory, after validating the payload.
         $expected = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'Programs\AstroStack'))
         if ([IO.Path]::GetFullPath($InstallDir) -ne $expected) { throw 'Percorso installazione non valido.' }
         if (Test-Path -LiteralPath $InstallDir) { Remove-Item -LiteralPath $InstallDir -Recurse -Force }
