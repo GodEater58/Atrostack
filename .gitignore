@@ -38,7 +38,5 @@ Thumbs.db
 
 # AstroStack local runtime/build artifacts
 source/build/
-source/setup/payload.zip
-source/setup/wheelhouse.zip
-source/AstroStack_Setup_Offline_*.exe
-source/AstroStack_Setup_Offline_*.sha256.txt
+source/AstroStack_*_Windows_x64.zip
+source/AstroStack_*_Windows_x64.zip.sha256.txt
