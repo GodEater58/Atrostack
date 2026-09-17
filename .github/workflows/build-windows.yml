@@ -6,7 +6,7 @@ on:
       version:
         description: 'Installer version label'
         required: false
-        default: '1.3.2_preview'
+        default: '1.4.0_preview'
   push:
     tags:
       - 'v*'
