@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '1.2.0_preview'
+    [string]$Version = '1.3.1_preview'
 )
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
