@@ -2,6 +2,10 @@
 
 Grazie per l'interesse nel progetto.
 
+## Versione di sviluppo
+
+Il ramo di sviluppo attuale è **AstroStack 1.4.0-preview**.
+
 ## Struttura principale
 
 Il sorgente attuale dell'applicazione si trova in `source/app/`.
@@ -47,3 +51,5 @@ python source/app/tests/smoke_gui.py
 Mantieni ogni PR focalizzata su un singolo obiettivo. Descrivi cosa cambia, come è stato testato e allega screenshot quando la modifica riguarda l'interfaccia.
 
 Non includere nella PR build locali, runtime Python, file `.exe`, ZIP, log o crash report: sono esclusi dal `.gitignore` e gli installer vengono generati da GitHub Actions.
+
+Quando descrivi funzioni o obiettivi del progetto, preferisci descrizioni tecniche dirette ed evita confronti promozionali con applicazioni di terze parti.
