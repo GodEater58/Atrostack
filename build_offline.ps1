@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '1.2.0_preview'
+    [string]$Version = '1.4.0_preview'
 )
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -40,7 +40,6 @@ $Req = Join-Path $Root 'app\requirements.txt'
 python -m pip download --only-binary=:all: --platform win_amd64 --python-version 312 --implementation cp --abi cp312 --dest $Wheelhouse -r $Req
 if ($LASTEXITCODE -ne 0) { throw 'Download wheel fallito.' }
 
-# Includi anche pip/setuptools/wheel nel caso il runtime abbia bisogno di aggiornamento locale.
 python -m pip download --only-binary=:all: --platform win_amd64 --python-version 312 --implementation py3 --dest $Wheelhouse pip setuptools wheel
 if ($LASTEXITCODE -ne 0) { throw 'Download toolchain pip fallito.' }
 
