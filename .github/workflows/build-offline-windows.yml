@@ -24,6 +24,20 @@ jobs:
             -DestinationPath ".\builder" `
             -Force
 
+      - name: Esponi sorgenti UI
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path .\ui-source | Out-Null
+          Copy-Item .\builder\app\astrostack\gui\*.py .\ui-source\ -Force
+          Copy-Item .\builder\app\main.py .\ui-source\app-main.py -Force
+
+      - name: Upload UI source
+        uses: actions/upload-artifact@v4
+        with:
+          name: AstroStack-UI-source-1.2
+          path: ui-source
+          if-no-files-found: error
+
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -38,11 +52,11 @@ jobs:
         shell: powershell
         run: |
           Push-Location .\builder\launcher
-          go mod init astrostack-launcher
+          if (-not (Test-Path go.mod)) { go mod init astrostack-launcher }
           Pop-Location
 
           Push-Location .\builder\setup
-          go mod init astrostack-setup
+          if (-not (Test-Path go.mod)) { go mod init astrostack-setup }
           Pop-Location
 
       - name: Build installer offline
