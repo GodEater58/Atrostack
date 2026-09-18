@@ -12,7 +12,7 @@ from .i18n import tr
 from .widgets import AnimatedButton
 
 FORMATS = [("tif16", "TIFF 16 bit (massima qualità)"), ("tif8", "TIFF 8 bit"), ("png16", "PNG 16 bit"),
-           ("png8", "PNG 8 bit"), ("jpg", "JPG (per web e social)"), ("fits", "FITS lineare (senza sviluppo, per Siril/PixInsight)")]
+           ("png8", "PNG 8 bit"), ("jpg", "JPG (per web e social)"), ("fits", "FITS lineare (senza sviluppo, per ulteriori elaborazioni)")]
 SCALE = [("original", "Originale"), ("percent", "Percentuale"), ("width", "Larghezza in pixel")]
 UPSCALE = [("lanczos", "Lanczos (nitido)"), ("cubic", "Cubico (morbido)"), ("linear", "Lineare (veloce)")]
 SHARP = [("none", "Nessuna"), ("low", "Leggera"), ("standard", "Standard"), ("high", "Forte")]

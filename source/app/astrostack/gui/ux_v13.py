@@ -943,6 +943,8 @@ def _open_project_path(
     window.layers = []
     window.layer_proxies = []
     window.stars_image = None
+    window._dev_undo = []
+    window._dev_redo = []
 
     if hasattr(
         window,

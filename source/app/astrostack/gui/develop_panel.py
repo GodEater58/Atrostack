@@ -1,4 +1,4 @@
-"""Pannello "Sviluppo": regolazioni stile Lightroom con anteprima in tempo reale."""
+"""Pannello "Sviluppo": regolazioni fotografiche con anteprima in tempo reale."""
 from __future__ import annotations
 
 import os
@@ -285,9 +285,9 @@ class DevelopPanel(QWidget):
         ("dettaglio", "sharpen_masking", "Mascheratura", 0, 100, 30, 0, ""),
         ("dettaglio", "nr_luminance", "Rumore lumin.", 0, 100, 0, 0, ""),
         ("dettaglio", "nr_color", "Rumore colore", 0, 100, 0, 0, ""),
-        ("dettaglio", "star_reduce", "Riduzione stelle", 0, 100, 0, 0, ""),
-        ("dettaglio", "deconv", "Deconvoluzione", 0, 100, 0, 0, ""),
-        ("dettaglio", "deconv_radius", "Raggio deconv.", 0.8, 8.0, 1.6, 1, " px"),
+        ("astro", "star_reduce", "Riduzione stelle", 0, 100, 0, 0, ""),
+        ("astro", "deconv", "Deconvoluzione", 0, 100, 0, 0, ""),
+        ("astro", "deconv_radius", "Raggio deconv.", 0.8, 8.0, 1.6, 1, " px"),
         ("dettaglio", "wavelet_small", "Dettaglio fine", -100, 100, 0, 0, ""),
         ("dettaglio", "wavelet_medium", "Dettaglio medio", -100, 100, 0, 0, ""),
         ("dettaglio", "wavelet_large", "Strutture grandi", -100, 100, 0, 0, ""),
@@ -313,6 +313,9 @@ class DevelopPanel(QWidget):
         lay.setSpacing(8)
         scroll.setWidget(inner)
         outer.addWidget(scroll)
+        self.scroll = scroll
+        self.section_groups = {}
+        self.active_section = "base"
 
         # intestazione: attiva / auto / reimposta
         head = QHBoxLayout()
@@ -328,13 +331,15 @@ class DevelopPanel(QWidget):
         self.btn_reset = AnimatedButton("Reimposta", "link")
         head.addWidget(self.enabled)
         head.addStretch(1)
-        head.addWidget(self.btn_pick)
-        head.addWidget(self.btn_auto)
-        head.addWidget(self.btn_assist)
-        head.addWidget(self.btn_reset)
         lay.addLayout(head)
+        actions = QHBoxLayout()
+        for button in (self.btn_pick, self.btn_auto, self.btn_assist, self.btn_reset):
+            button.setMinimumWidth(0)
+            button.setMinimumHeight(30)
+            actions.addWidget(button)
+        lay.addLayout(actions)
         self.hist = HistogramWidget()
-        lay.addWidget(self.hist)
+        outer.addWidget(self.hist)
 
         self.sliders: dict[str, ParamSlider] = {}
         groups: dict[str, QVBoxLayout] = {}
@@ -343,6 +348,7 @@ class DevelopPanel(QWidget):
             gl = QVBoxLayout(g)
             gl.setSpacing(4)
             groups[key] = gl
+            self.section_groups[key] = g
             if key == "base":
                 srow = QHBoxLayout()
                 lab = QLabel("Tipo di stretch")
@@ -425,8 +431,18 @@ class DevelopPanel(QWidget):
         self.btn_assist.setToolTipDuration(60000)
         self._load_last()
 
+    def show_section(self, section: str):
+        self.active_section = section
+        visible = {"base": {"base"}, "astro": {"astro"},
+                   "colore": {"colore", "hsl"}, "dettaglio": {"dettaglio"},
+                   "curve": {"curve"}, "geometria": {"geometria", "effetti"}}.get(section, {section})
+        for key, group in self.section_groups.items():
+            group.setVisible(key in visible)
+        self.scroll.verticalScrollBar().setValue(0)
+
     def _hsl_group(self, lay):
         g = QGroupBox("HSL — colore per colore")
+        self.section_groups["hsl"] = g
         gl = QVBoxLayout(g)
         self.hsl_tabs = QTabWidget()
         self.hsl_sliders: dict[str, list[ParamSlider]] = {"h": [], "s": [], "l": []}
@@ -460,6 +476,7 @@ class DevelopPanel(QWidget):
 
     def _curve_group(self, lay):
         g = QGroupBox("Curva dei toni")
+        self.section_groups["curve"] = g
         gl = QVBoxLayout(g)
         self.curve = CurveWidget()
         self.curve.changed.connect(self._emit)
