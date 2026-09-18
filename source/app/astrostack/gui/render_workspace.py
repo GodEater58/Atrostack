@@ -503,6 +503,11 @@ class RenderWorkspace(QObject):
             original(rgb8)
             self.update_state()
         w._on_rendered = types.MethodType(rendered, w)
+        original_before = w._on_before
+        def before_ready(this, rgb8):
+            original_before(rgb8)
+            self.position_overlay()
+        w._on_before = types.MethodType(before_ready, w)
 
     def refresh_theme(self):
         w = self.window
