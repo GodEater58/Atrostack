@@ -47,6 +47,16 @@ def main() -> int:
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), "astrostack", "assets", "astrostack.ico")
     if os.path.isfile(icon):
         app.setWindowIcon(QIcon(icon))
+    probe_report = None
+    if len(sys.argv) == 3 and sys.argv[1] == "--self-test-report":
+        # This explicit build-verification mode does not run during normal startup.
+        if os.environ.get("GITHUB_ACTIONS") != "true":
+            raise RuntimeError("The portable self-test requires an isolated CI runner")
+        probe_report = sys.argv[2]
+        from PySide6.QtCore import QSettings
+        settings = QSettings("AstroStack", "AstroStack")
+        settings.setValue("guide_seen", "1")
+        settings.setValue("ui_mode", "advanced")
     win = MainWindow()
     install_ux_v13(win)
     install_ux_v14(win)
@@ -72,6 +82,9 @@ def main() -> int:
             lambda p=startup_project: win.open_project(path=p),
         )
 
+    if probe_report:
+        from astrostack.gui.portable_probe import attach
+        attach(win, probe_report)
     return app.exec()
 
 

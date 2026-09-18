@@ -47,10 +47,21 @@ un TIFF RGB a 16 bit. Layout verificato a 1120×680, 1366×768, 1920×1080 e 256
 (pixel logici Qt). Le immagini sotto sono catture dell'app in esecuzione con una
 fixture sintetica, non render promozionali.
 
-Non è stata eseguita una verifica su Windows nativo. Questo branch contiene il
-rifacimento dei sorgenti; non contiene un nuovo ZIP portabile Windows o un nuovo EXE.
-Il vecchio workflow `build-offline-windows.yml` genera ancora codice 1.3 e deve essere
-aggiornato prima di usarlo per distribuire la 1.4: non usarlo per impacchettare questo branch.
+La pipeline `build-offline-windows.yml` prepara ora lo ZIP portabile 1.4 dai sorgenti
+esatti del checkout, senza riscrivere la versione o i moduli dell'interfaccia.
+Include launcher nativo Windows GUI, Python 3.12.10 privato e tutte le dipendenze.
+`BUILD-MANIFEST.json` registra commit, versioni delle librerie e hash dei file.
+
+La pipeline verifica lo ZIP estratto in un percorso con spazi: runtime isolato,
+manifest, test funzionali, export TIFF e avvio reale di AstroStack.exe con il plugin
+Qt Windows e senza finestra console. La rete per Python è disabilitata durante
+le prove mediante proxy non raggiungibile e PIP_NO_INDEX. Il pacchetto viene
+pubblicato come artifact verificato soltanto se tutti i controlli hanno successo.
+Le schermate e il rapporto del launcher sono in un artifact separato.
+
+Per costruire su Windows con Python 3.12 e Go installati: `./source/build_portable.ps1`.
+La compilazione richiede Internet; l'utente finale estrae lo ZIP e apre AstroStack.exe.
+Lo stato effettivo della verifica Windows è quello del run GitHub Actions del commit.
 Le funzioni avanzate mantengono i limiti dei rispettivi algoritmi già presenti.
 
 ![Editor](editor-1366.png)
