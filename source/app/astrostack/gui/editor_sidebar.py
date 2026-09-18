@@ -4,7 +4,8 @@ from __future__ import annotations
 import os
 from datetime import datetime
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QByteArray, QBuffer, QIODevice, Qt, Signal
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
                                QPushButton, QVBoxLayout, QWidget)
 
@@ -142,15 +143,32 @@ class EditorSidebar(QWidget):
         out = []
         for i in range(self.snapshot_list.count()):
             it = self.snapshot_list.item(i)
-            out.append({"name": it.text(), "params": str(it.data(Qt.ItemDataRole.UserRole) or "")})
+            row = {"name": it.text(), "params": str(it.data(Qt.ItemDataRole.UserRole) or "")}
+            if not it.icon().isNull():
+                buffer = QBuffer()
+                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                it.icon().pixmap(110, 65).save(buffer, "PNG")
+                row["thumbnail"] = bytes(buffer.data().toBase64()).decode("ascii")
+            out.append(row)
         return out
 
     def set_snapshots(self, items: list[dict]):
-        self.snapshot_list.clear()
-        for row in items or []:
-            payload = str(row.get("params", ""))
-            if payload:
-                self.add_snapshot(payload, str(row.get("name", "Snapshot")))
+        self._restoring_snapshots = True
+        try:
+            self.snapshot_list.clear()
+            # Insertion is at the front; reverse to preserve the saved order.
+            for row in reversed(items or []):
+                payload = str(row.get("params", ""))
+                if payload:
+                    self.add_snapshot(payload, str(row.get("name", "Snapshot")))
+                    encoded = str(row.get("thumbnail", ""))
+                    if encoded and len(encoded) < 200000:
+                        pixmap = QPixmap()
+                        pixmap.loadFromData(QByteArray.fromBase64(encoded.encode("ascii", errors="ignore")))
+                        if not pixmap.isNull():
+                            self.snapshot_list.item(0).setIcon(QIcon(pixmap))
+        finally:
+            self._restoring_snapshots = False
 
     def add_history(self, text: str):
         stamp = datetime.now().strftime("%H:%M:%S")

@@ -42,3 +42,4 @@ source/setup/payload.zip
 source/setup/wheelhouse.zip
 source/AstroStack_Setup_Offline_*.exe
 source/AstroStack_Setup_Offline_*.sha256.txt
+source/build-portable/

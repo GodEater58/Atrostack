@@ -138,7 +138,7 @@ DICT: dict[str, str] = {
     "Esporta immagine": "Export image", "Formato": "Format", "TIFF 16 bit (massima qualità)": "TIFF 16-bit (best quality)",
     "TIFF 8 bit": "TIFF 8-bit", "PNG 16 bit": "PNG 16-bit", "PNG 8 bit": "PNG 8-bit",
     "JPG (per web e social)": "JPG (for web and social)",
-    "FITS lineare (senza sviluppo, per Siril/PixInsight)": "Linear FITS (no develop, for Siril/PixInsight)",
+    "FITS lineare (senza sviluppo, per ulteriori elaborazioni)": "Linear FITS (no develop, for further processing)",
     "Qualità JPG": "JPG quality", "Compressione PNG": "PNG compression", "Compressione TIFF": "TIFF compression",
     "Senza perdita (zlib): file più piccolo": "Lossless (zlib): smaller file",
     "Nessuna: file più grande, apertura più veloce": "None: bigger file, faster to open",
@@ -319,7 +319,7 @@ _TIP_EN = {
         "degree": ("Model degree", "How complex the gradient model is.<br><b>1</b>: tilted plane.<br><b>2</b>: recommended.<br>"
                    "<b>3–4</b>: complex gradients; with trees or a horizon in the frame they can create halos."),
         "neutralize": ("Neutralise the background", "Brings the sky background to the same level in all three channels: removes the colour cast."),
-        "star_color": ("Colour-calibrate on the stars", "White reference = average colour of the unsaturated stars, the method used by Siril and PixInsight. The background stays neutral."),
+        "star_color": ("Colour-calibrate on the stars", "White reference = average colour of the unsaturated stars, using the average stellar colour. The background stays neutral."),
         "white_balance": ("White balance", "Coefficients read from the RAW file, applied before debayering.<br>"
                           "• <b>Daylight</b>: the camera's standard coefficients, identical for every shot (recommended).<br>"
                           "• <b>As shot</b>: the in-camera setting.<br>• <b>None</b>: raw data, green image."),
@@ -396,7 +396,7 @@ _TIP_EN = {
         "load_mask": ("Load mask", "Greyscale image (white = visible, black = hidden), resized to the canvas."),
     },
     "DEVELOP": {
-        "stretch_type": ("Stretch type", "How the linear data is made visible.<br>• <b>Classic (MTF)</b>: like Siril, most detail in the background.<br>• <b>Arcsinh</b>: bright stars keep their colour instead of turning white.<br>• <b>Hybrid</b>: average of the two."),
+        "stretch_type": ("Stretch type", "How the linear data is made visible.<br>• <b>Classic (MTF)</b>: most detail in the background.<br>• <b>Arcsinh</b>: bright stars keep their colour instead of turning white.<br>• <b>Hybrid</b>: average of the two."),
         "star_reduce": ("Star reduction", "Shrinks the stars without deleting them: the Milky Way and nebulae stand out.<br><b>30–50</b>: natural.<br><b>80–100</b>: very strong, the faintest stars disappear."),
         "hsl": ("HSL", "Adjusts every colour range separately: <b>Hue</b> shifts it, <b>Saturation</b> makes it more or less vivid, <b>Luminance</b> brightens or darkens it. Example: lower the saturation of orange to tame light pollution, raise the blue of the sky."),
         "enabled": ("Develop on", "Turns every adjustment on or off: a quick before/after."),
@@ -562,6 +562,30 @@ def _retranslate_widget(w: QWidget):
                                                     "stelle", "fase", "identità", "stars", "phase", "identity"):
                     it.setText(tr(_back(it.text())))
 
+
+# Desktop 1.4 workspace.
+DICT.update({
+    "Dalle tue immagini, nuovi universi": "New universes from your images",
+    "Progetti": "Projects", "Altre azioni ▾": "More actions ▾", "Pannelli": "Panels",
+    "Modalità": "Mode", "Semplice": "Simple", "Avanzata": "Advanced",
+    "Regolazioni di base": "Basic adjustments", "Strumenti astro": "Astro tools",
+    "Colore / HSL": "Colour / HSL", "Curva dei toni": "Tone curve",
+    "Geometria / effetti": "Geometry / effects", "Livelli e maschere": "Layers and masks",
+    "Cronologia": "History", "+ Snapshot": "+ Snapshot", "Prima": "Before", "Dopo": "After",
+    "01   Importa": "01   Import", "02   Controlla": "02   Inspect", "04   Risultato": "04   Result",
+    "Il tuo prossimo cielo inizia qui": "Your next sky starts here",
+    "Apri un'immagine per iniziare lo sviluppo.\nRAW · FITS · TIFF · PNG · JPEG": "Open an image to start editing.\nRAW · FITS · TIFF · PNG · JPEG",
+    "Scegli il flusso di lavoro da cui partire.": "Choose where to start.",
+    "Sviluppo standalone per RAW, FITS e immagini finite.": "Standalone editing for RAW, FITS and finished images.",
+    "Calibra, analizza, allinea e combina i tuoi frame.": "Calibrate, analyse, align and combine your frames.",
+    "Apri, salva e riprendi le tue sessioni AstroStack.": "Open, save and resume your AstroStack sessions.",
+    "Stack, sviluppa e rifinisci il cielo\nin un unico spazio di lavoro.": "Stack, develop and refine the sky\nin one workspace.",
+    "Dai frame al master": "From frames to master", "Sviluppo standalone": "Standalone editing",
+    "Riprendi il lavoro": "Resume your work", "Apri Editor": "Open Editor", "Apri progetto": "Open project",
+    "ULTIMO PROGETTO": "LAST PROJECT", "PROGETTI": "PROJECTS", "RECENTE": "RECENT",
+    "Il tuo lavoro, sempre riprendibile.": "Your work, ready to resume.",
+    "Offline-first • elaborazione locale": "Offline-first • local processing",
+})
 
 _BACK = {v: k for k, v in DICT.items()}
 

@@ -1,0 +1,12 @@
+AstroStack includes third-party software in its private runtime.
+
+Python: the Python Software Foundation license is included as runtime/LICENSE.txt.
+NumPy, SciPy, OpenCV, rawpy/LibRaw, tifffile, Astropy, ExifRead, Requests,
+PySide6, Shiboken6 and their dependencies retain their respective licenses
+and notices in runtime/Lib/site-packages and the associated *.dist-info directories.
+Qt/PySide6 is dynamically loaded; the runtime and application files remain separate.
+IBM Plex fonts and their license are in app/astrostack/assets/fonts.
+The exact versions and file hashes are recorded in BUILD-MANIFEST.json.
+
+AstroStack source and corresponding build scripts:
+https://github.com/GodEater58/Atrostack/tree/astrostack-1.4-render-layout

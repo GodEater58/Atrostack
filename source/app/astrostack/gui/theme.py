@@ -3,13 +3,13 @@
 # tema corrente: "scuro" (notturno) oppure "chiaro"
 THEME = "scuro"
 
-BG = "#141A2A"
-PANEL = "#1B2336"
-PANEL2 = "#222B42"
-BORDER = "#2E3A57"
-TEXT = "#E8ECF5"
-MUTED = "#94A0BE"
-ACCENT = "#F2B441"        # oro: il pulsante Stack e gli elementi attivi
+BG = "#080F18"
+PANEL = "#0D1925"
+PANEL2 = "#122332"
+BORDER = "#263E50"
+TEXT = "#E6EDF5"
+MUTED = "#93A9BC"
+ACCENT = "#E9BB55"        # oro: il pulsante Stack e gli elementi attivi
 ACCENT_TEXT = "#1A1405"
 OK = "#5FD39B"
 WARN = "#F07E6E"
@@ -59,7 +59,7 @@ QCheckBox::indicator {{ width: 20px; height: 20px; border-radius: 6px; border: 1
 QCheckBox::indicator:hover {{ border-color: {ACCENT}; }}
 QCheckBox::indicator:checked {{ background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {ACCENTHI}, stop:1 {ACCENT}); border-color: {ACCENT}; image: url("__CHECK__"); }}
 QCheckBox::indicator:disabled {{ border-color: {PANEL2}; background: {PANEL}; }}
-QSlider::groove:horizontal {{ height: 6px; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #2E3A57, stop:1 #3A4868); border-radius: 3px; }}
+QSlider::groove:horizontal {{ height: 6px; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #263E50, stop:1 #3A4868); border-radius: 3px; }}
 QSlider::sub-page:horizontal {{ background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {ACCENTLO2}, stop:1 {ACCENT}); border-radius: 3px; }}
 QSlider::handle:horizontal {{ width: 20px; height: 20px; margin: -7px 0; border-radius: 10px; background: qradialgradient(cx:0.5, cy:0.4, radius:0.7, fx:0.5, fy:0.4, stop:0 {ACCENTGLOW}, stop:1 {ACCENT}); border: 1px solid {ACCENTLO}; }}
 QSlider::handle:horizontal:hover {{ background: {ACCENTHI2}; }}
@@ -148,10 +148,10 @@ def load_fonts() -> str:
     return "IBM Plex Sans" if ok else "Segoe UI"
 
 
-LIGHT = {"BG": "#F2F4F9", "PANEL": "#FFFFFF", "PANEL2": "#E9EDF6", "BORDER": "#C8D0E2", "TEXT": "#1B2336",
+LIGHT = {"BG": "#F2F4F9", "PANEL": "#FFFFFF", "PANEL2": "#E9EDF6", "BORDER": "#C8D0E2", "TEXT": "#0D1925",
          "MUTED": "#5C6684", "ACCENT": "#C8891A", "ACCENT_TEXT": "#FFFFFF", "OK": "#2E9E6B", "WARN": "#C6493A"}
-DARK = {"BG": "#141A2A", "PANEL": "#1B2336", "PANEL2": "#222B42", "BORDER": "#2E3A57", "TEXT": "#E8ECF5",
-        "MUTED": "#94A0BE", "ACCENT": "#F2B441", "ACCENT_TEXT": "#1A1405", "OK": "#5FD39B", "WARN": "#F07E6E"}
+DARK = {"BG": "#080F18", "PANEL": "#0D1925", "PANEL2": "#122332", "BORDER": "#263E50", "TEXT": "#E6EDF5",
+        "MUTED": "#93A9BC", "ACCENT": "#E9BB55", "ACCENT_TEXT": "#1A1405", "OK": "#5FD39B", "WARN": "#F07E6E"}
 
 
 def set_theme(name: str):

@@ -152,7 +152,7 @@ GUIDE_HTML = """
 Solo i <b>light</b> sono obbligatori.</p>
 <p><b>2. Premi Stack.</b> Calibrazione, allineamento sulle stelle, scarto dei frame mossi, somma,
 rimozione dell'inquinamento luminoso e colori: tutto automatico. L'anteprima migliora frame dopo frame.</p>
-<p><b>3. Sviluppa ed esporta.</b> Il pannello <b>Sviluppo</b> (a destra) ha i cursori in stile Lightroom;
+<p><b>3. Sviluppa ed esporta.</b> Il pannello <b>Sviluppo</b> (a destra) offre regolazioni fotografiche;
 <b>Livelli</b> serve a fondere il cielo con una foto del primo piano. Poi <b>Esporta…</b>.</p>
 <p style="color:{muted}">Passando il mouse su qualsiasi opzione compare una spiegazione.
 In alto a destra puoi cambiare lingua (IT / EN).</p>

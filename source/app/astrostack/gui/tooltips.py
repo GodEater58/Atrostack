@@ -43,7 +43,7 @@ OPTIONS = {
                       "dominante (arancione dei lampioni, verde del sensore).<br>"
                       "<b>Disattivo</b>: il fondo mantiene il colore originale."),
     "star_color": tip("Calibra i colori sulle stelle", "Riferimento bianco = colore medio delle stelle non sature: "
-                      "R e B vengono riscalati in modo che la stella 'media' sia bianca (metodo di Siril e PixInsight). "
+                      "R e B vengono riscalati in modo che la stella 'media' sia bianca (riferimento stellare medio). "
                       "Il fondo resta neutro.<br><b>Disattivo</b>: i colori dipendono solo dal bilanciamento del RAW."),
     "white_balance": tip("Bilanciamento del bianco", "Coefficienti letti dal file RAW, applicati prima del debayer.<br>"
                          "• <b>Luce diurna</b>: coefficienti standard della fotocamera, uguali per tutti gli scatti (consigliato).<br>"
@@ -196,7 +196,7 @@ TOOLS = {
 }
 
 DEVELOP = {
-    "stretch_type": tip("Tipo di stretch", "Come i dati lineari vengono resi visibili.<br>• <b>Classico (MTF)</b>: come Siril, "
+    "stretch_type": tip("Tipo di stretch", "Come i dati lineari vengono resi visibili.<br>• <b>Classico (MTF)</b>: "
                         "massimo dettaglio nel fondo.<br>• <b>Arcsinh</b>: le stelle brillanti restano colorate invece di "
                         "diventare bianche.<br>• <b>Ibrido</b>: media dei due."),
     "star_reduce": tip("Riduzione stelle", "Rimpicciolisce le stelle senza cancellarle: la Via Lattea e le nebulose "
@@ -206,7 +206,7 @@ DEVELOP = {
                "dell'arancione per attenuare l'inquinamento luminoso, alza il blu del cielo."),
     "enabled": tip("Sviluppo attivo", "Applica le regolazioni all'anteprima e all'esportazione. Disattivo = immagine "
                    "base (solo stiramento automatico)."),
-    "auto": tip("Auto", "Regola in automatico Neri e Bianchi in base all'istogramma, come il pulsante Auto di Lightroom."),
+    "auto": tip("Auto", "Regola in automatico Neri e Bianchi in base all'istogramma."),
     "reset": tip("Reimposta", "Riporta tutti i cursori ai valori predefiniti. Doppio clic su una singola etichetta "
                  "reimposta solo quel cursore."),
     "preset_save": tip("Salva preset", "Salva tutte le regolazioni in un file .json da riapplicare ad altre foto."),
@@ -263,14 +263,14 @@ DEVELOP = {
 EXPORT = {
     "fmt": tip("Formato", "• <b>TIFF 16 bit</b>: massima qualità, per stampa e ulteriori modifiche.<br>"
                "• <b>TIFF/PNG 8 bit</b>: qualità normale, file più piccoli.<br>• <b>PNG 16 bit</b>: senza perdita, compatibile ovunque.<br>"
-               "• <b>JPG</b>: per web e social (con perdita).<br>• <b>FITS</b>: dati lineari senza sviluppo, per Siril/PixInsight."),
+               "• <b>JPG</b>: per web e social (con perdita).<br>• <b>FITS</b>: dati lineari senza sviluppo, per ulteriori elaborazioni."),
     "quality": tip("Qualità JPG", "80–90 = ottimo compromesso; 95–100 = quasi senza perdita ma file 2–3 volte più grande."),
     "png_level": tip("Compressione PNG", "Senza perdita: cambia solo dimensione del file e tempo di scrittura."),
     "tiff_comp": tip("Compressione TIFF", "Zlib è senza perdita e dimezza il file; 'Nessuna' si apre più in fretta nei programmi vecchi."),
     "scale_mode": tip("Risoluzione", "Originale, in percentuale (200 % = raddoppia la risoluzione) oppure larghezza in pixel "
                       "(es. 2048 per i social)."),
     "upscale": tip("Ingrandimento", "Metodo usato quando si aumenta la risoluzione: Lanczos è il più nitido."),
-    "out_sharpen": tip("Nitidezza in uscita", "Piccola nitidezza aggiunta dopo il ridimensionamento, come in Lightroom "
+    "out_sharpen": tip("Nitidezza in uscita", "Piccola nitidezza aggiunta dopo il ridimensionamento, utile "
                        "(consigliata 'Standard' quando si riduce per il web)."),
     "apply_dev": tip("Regolazioni di Sviluppo", "Esporta l'immagine come la vedi nel pannello Sviluppo. Disattivo = solo stiramento automatico."),
 }

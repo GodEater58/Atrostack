@@ -402,7 +402,7 @@ class MainWindow(QMainWindow):
         self.btn_layers = AnimatedButton("Livelli")
         self.btn_layers.setCheckable(True)
         self.btn_layers.setToolTip(T.tip("Livelli", "Fonde più foto: ad esempio il cielo stackato con uno scatto del primo "
-                                         "piano, con maschere, opacità e metodi di fusione come in Photoshop."))
+                                         "piano, con maschere, opacità e metodi di fusione con controlli dedicati."))
         self.btn_layers.toggled.connect(self.dock_layers.setVisible)
         self.dock_layers.visibilityChanged.connect(lambda v: self.btn_layers.setChecked(v))
         context.addWidget(self.btn_layers)
@@ -421,7 +421,7 @@ class MainWindow(QMainWindow):
         self.view.sampled.connect(self._sample_point)
         self.develop_panel.btn_pick.toggled.connect(self.view.set_sample_mode)
         self.view.paint_done.connect(lambda: self._refresh_preview(full=False))
-        self.btn_develop.setToolTip(T.tip("Sviluppo", "Apre il pannello con le regolazioni stile Lightroom "
+        self.btn_develop.setToolTip(T.tip("Sviluppo", "Apre il pannello con le regolazioni fotografiche "
                                           "(tono, colore, dettaglio, curva, geometria). Ctrl+D."))
         act_dev = QAction("Sviluppo", self)
         act_dev.setShortcut(QKeySequence("Ctrl+D"))
@@ -708,6 +708,8 @@ class MainWindow(QMainWindow):
         self._undo = []
         self.layers = []
         self.layer_proxies = []
+        self._dev_undo = []
+        self._dev_redo = []
         if hasattr(self, "editor_sidebar"):
             self.editor_sidebar.set_snapshots([])
             self.editor_sidebar.clear_history()
@@ -891,10 +893,12 @@ class MainWindow(QMainWindow):
         self._refresh_preview(full)
 
     def _on_dev_params(self, p: DevelopParams):
-        if not self._dev_undo or self._dev_undo[-1] != p.to_json():
-            self._push_dev_undo(p)
         idx = self.layers_panel.current_index() if self.layers else 0
         previous = self.layers[idx].params if self.layers and 0 <= idx < len(self.layers) else self.dev_params
+        if not self._dev_undo:
+            self._push_dev_undo(previous)
+        if self._dev_undo[-1] != p.to_json():
+            self._push_dev_undo(p)
         if self.layers and 0 <= idx < len(self.layers):
             self.layers[idx].params = p
             invalidate(self.layers[idx])
@@ -1591,6 +1595,8 @@ class MainWindow(QMainWindow):
         self._undo = []
         self.layers = []
         self.layer_proxies = []
+        self._dev_undo = []
+        self._dev_redo = []
         self.stars_image = None
         if hasattr(self, "editor_sidebar"):
             self.editor_sidebar.clear_history()
@@ -1776,6 +1782,8 @@ class MainWindow(QMainWindow):
         self._undo = []
         self.layers = []
         self.layer_proxies = []
+        self._dev_undo = []
+        self._dev_redo = []
         if hasattr(self, "editor_sidebar"):
             self.editor_sidebar.set_snapshots([])
             self.editor_sidebar.clear_history()

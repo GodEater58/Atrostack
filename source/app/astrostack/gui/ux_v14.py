@@ -59,6 +59,10 @@ QLabel[role="v14Brand"] {{ color: {TH.TEXT}; font-size: 18px; font-weight: 700; 
 QLabel[role="v14Hero"] {{ color: {TH.TEXT}; font-size: 30px; font-weight: 700; }}
 QLabel[role="v14PageTitle"] {{ color: {TH.TEXT}; font-size: 18px; font-weight: 650; }}
 QLabel[role="v14CardTitle"] {{ color: {TH.TEXT}; font-size: 16px; font-weight: 650; }}
+QSlider::groove:horizontal {{ height: 4px; background: {TH.BORDER}; }}
+QSlider::handle:horizontal {{ width: 12px; height: 12px; margin: -4px 0; border-radius: 6px; background: {TH.ACCENT}; }}
+QDoubleSpinBox {{ min-height: 20px; padding-top: 2px; padding-bottom: 2px; }}
+QGroupBox {{ margin-top: 12px; border-radius: 6px; }}
 QLabel[role="v14Eyebrow"] {{ color: {TH.ACCENT}; font-size: 11px; font-weight: 700; }}
 """
 
@@ -100,7 +104,7 @@ def _hide_legacy_chrome(window):
             rule.hide()
     if hasattr(window, "context_bar"):
         window.context_bar.hide()
-    root.setContentsMargins(18, 10, 18, 14)
+    root.setContentsMargins(10, 8, 10, 8)
     root.setSpacing(10)
 
 
@@ -115,75 +119,51 @@ def _make_nav_button(text):
 def _build_shell(window):
     old = window.takeCentralWidget()
     window._v14_legacy_content = old
-
     shell = QWidget()
-    outer = QHBoxLayout(shell)
+    outer = QVBoxLayout(shell)
     outer.setContentsMargins(0, 0, 0, 0)
     outer.setSpacing(0)
-
     rail = QFrame()
-    rail.setProperty("role", "v14Rail")
-    rail.setFixedWidth(214)
-    rail_layout = QVBoxLayout(rail)
-    rail_layout.setContentsMargins(16, 18, 16, 16)
-    rail_layout.setSpacing(10)
-
-    brand_row = QHBoxLayout()
-    brand_row.setSpacing(9)
-    icon_label = QLabel()
+    rail.setProperty("role", "v14Topbar")
+    row = QHBoxLayout(rail)
+    row.setContentsMargins(20, 12, 20, 12)
+    row.setSpacing(10)
+    icon = QLabel()
     icon_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "astrostack.ico")
-    if os.path.isfile(icon_path):
-        icon_label.setPixmap(QIcon(icon_path).pixmap(30, 30))
-    brand_row.addWidget(icon_label)
+    icon.setPixmap(QIcon(icon_path).pixmap(34, 34))
+    row.addWidget(icon)
+    brand_box = QVBoxLayout()
+    brand_box.setSpacing(0)
     brand = QLabel("AstroStack")
     brand.setProperty("role", "v14Brand")
-    brand_row.addWidget(brand, 1)
-    rail_layout.addLayout(brand_row)
-
-    tagline = QLabel("Astrofotografia, senza rumore.")
+    brand_box.addWidget(brand)
+    tagline = QLabel("Dalle tue immagini, nuovi universi")
     tagline.setProperty("role", "muted")
-    tagline.setWordWrap(True)
-    rail_layout.addWidget(tagline)
-    rail_layout.addSpacing(12)
-
+    brand_box.addWidget(tagline)
+    row.addLayout(brand_box)
+    row.addStretch(1)
     nav_group = QButtonGroup(window)
     nav_group.setExclusive(True)
-    window.v14_nav_home = _make_nav_button("Home")
-    window.v14_nav_stack = _make_nav_button("Stack")
-    window.v14_nav_editor = _make_nav_button("Editor")
-    window.v14_nav_projects = _make_nav_button("Progetti")
-    for button in (window.v14_nav_home, window.v14_nav_stack, window.v14_nav_editor, window.v14_nav_projects):
+    for key, label in (("home", "Home"), ("stack", "Stack"), ("editor", "Editor"), ("projects", "Progetti")):
+        button = _make_nav_button(label)
+        button.setMinimumWidth(94)
+        setattr(window, "v14_nav_" + key, button)
         nav_group.addButton(button)
-        rail_layout.addWidget(button)
+        row.addWidget(button)
     window.v14_nav_group = nav_group
-    rail_layout.addStretch(1)
-
-    version = QLabel(f"AstroStack {__version__}")
+    row.addStretch(1)
+    version = QLabel("v" + __version__)
     version.setProperty("role", "muted")
-    version.setWordWrap(True)
-    rail_layout.addWidget(version)
-
-    utility = QHBoxLayout()
-    utility.setSpacing(6)
-    window.v14_btn_info = AnimatedButton("Info", "link")
-    window.v14_btn_lang = AnimatedButton("EN" if i18n.language() == "it" else "IT", "link")
-    window.v14_btn_theme = AnimatedButton("Tema", "link")
-    utility.addWidget(window.v14_btn_info)
-    utility.addWidget(window.v14_btn_lang)
-    utility.addWidget(window.v14_btn_theme)
-    rail_layout.addLayout(utility)
-
-    content_host = QFrame()
-    content_layout = QVBoxLayout(content_host)
-    content_layout.setContentsMargins(0, 0, 0, 0)
-    content_layout.setSpacing(0)
-    content_layout.addWidget(old)
-
+    row.addWidget(version)
+    for key, label in (("info", "Info"), ("lang", "EN" if i18n.language() == "it" else "IT"), ("theme", "Tema")):
+        button = AnimatedButton(label, "link")
+        setattr(window, "v14_btn_" + key, button)
+        row.addWidget(button)
     outer.addWidget(rail)
-    outer.addWidget(content_host, 1)
+    outer.addWidget(old, 1)
     window.v14_shell = shell
     window.v14_rail = rail
-    window.v14_content_host = content_host
+    window.v14_content_host = old
     window.setCentralWidget(shell)
 
 
@@ -326,6 +306,9 @@ def _rebuild_home(window):
     tips.addWidget(right_tip, 1)
     layout.addLayout(tips)
     layout.addStretch(1)
+    window.btn_home_recent = window.v14_recent_open
+    window.home_recent_name = window.v14_recent_name
+    window.home_recent_path = window.v14_recent_path
     _update_recent(window)
 
 
@@ -435,22 +418,23 @@ def _set_nav(window, key):
 
 def _set_topbar(window, title, subtitle, action=None):
     if hasattr(window, "v14_page_title"):
-        window.v14_page_title.setText(title)
+        window.v14_page_title.setText(i18n.tr(title))
     if hasattr(window, "v14_page_subtitle"):
-        window.v14_page_subtitle.setText(subtitle)
+        window.v14_page_subtitle.setText(i18n.tr(subtitle))
     button = getattr(window, "v14_context_action", None)
     if button is None:
         return
-    try:
-        button.clicked.disconnect()
-    except Exception:
-        pass
+    previous = getattr(window, "_v14_context_callback", None)
+    if previous is not None:
+        button.clicked.disconnect(previous)
+        window._v14_context_callback = None
     if action is None:
         button.hide()
     else:
         text, callback = action
-        button.setText(text)
+        button.setText(i18n.tr(text))
         button.clicked.connect(callback)
+        window._v14_context_callback = callback
         button.show()
 
 
@@ -467,6 +451,8 @@ def _show_home(window):
     _set_nav(window, "home")
     _set_topbar(window, "Home", "Scegli il flusso di lavoro da cui partire.", None)
     _update_recent(window)
+    if hasattr(window, "render_workspace"):
+        window.render_workspace.route("home")
 
 
 def _show_projects(window):
@@ -482,9 +468,13 @@ def _show_projects(window):
     _set_nav(window, "projects")
     _set_topbar(window, "Progetti", "Apri, salva e riprendi le tue sessioni AstroStack.", ("Apri progetto…", lambda: window.open_project()))
     _update_recent(window)
+    if hasattr(window, "render_workspace"):
+        window.render_workspace.route("projects")
 
 
 def _sync_workspace(window, mode):
+    if hasattr(window, "render_workspace"):
+        window.render_workspace.route(mode)
     if hasattr(window, "home_panel"):
         window.home_panel.hide()
     projects = getattr(window, "v14_projects_panel", None)
@@ -520,11 +510,14 @@ def _wire_navigation(window):
         new_lang = "en" if i18n.language() == "it" else "it"
         window.set_language(new_lang)
         window.v14_btn_lang.setText("IT" if new_lang == "en" else "EN")
+        window.render_workspace.sync_mode()
     window.v14_btn_lang.clicked.connect(toggle_language)
 
     def toggle_theme():
         window.toggle_theme()
         _apply_v14_style()
+        if hasattr(window, "render_workspace"):
+            window.render_workspace.refresh_theme()
     window.v14_btn_theme.clicked.connect(toggle_theme)
 
 
@@ -532,7 +525,7 @@ def install(window):
     if getattr(window, "_ux_v14_installed", False):
         return
     window._ux_v14_installed = True
-    window.setMinimumSize(1120, 700)
+    window.setMinimumSize(1120, 680)
     _hide_legacy_chrome(window)
     _build_shell(window)
     _build_topbar(window)
@@ -540,5 +533,12 @@ def install(window):
     _build_projects_page(window)
     _wrap_workspace(window)
     _wire_navigation(window)
+    from .render_workspace import install as install_workspace
+    install_workspace(window)
     _apply_v14_style()
+    i18n.skip(window.v14_page_title, window.v14_page_subtitle, window.v14_context_action,
+              window.v14_recent_name, window.v14_recent_path, window.v14_projects_recent_name,
+              window.v14_projects_recent_path, window.editor_sidebar.source_name,
+              window.editor_sidebar.source_meta, window.preview_label, window.status)
     _show_home(window)
+    i18n.retranslate(window)
