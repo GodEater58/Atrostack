@@ -1,0 +1,1554 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3f6fa">
+<title>Officina Stock Mobile 2.7.0</title>
+<style>
+:root{--bg:#f3f6fa;--bg2:#e9eef5;--panel:#ffffff;--panel2:#f5f8fc;--text:#172033;--muted:#68758a;--accent:#169b78;--accent2:#2f78d2;--warn:#bd7a13;--danger:#d84a4a;--ok:#278b57;--line:#d7deea;--shadow:0 14px 38px rgba(28,42,62,.12);--topbar:rgba(255,255,255,.94);--nav:rgba(255,255,255,.96);--input:#ffffff;--surface:#f7f9fc;--surface2:#eef3f8;--tablehead:#eef2f7;--desc:#344259;--pillborder:#d3dce8;--pillOk:#176b3a;--pillOkBorder:#8fc7a4;--pillWarn:#8a5a0a;--pillWarnBorder:#d9b86a;--pillDanger:#a83232;--pillDangerBorder:#df9b9b;--toast:#172033;--toastText:#ffffff;--overlay:rgba(15,23,42,.54);--sheet:#ffffff}
+:root[data-theme="dark"]{--bg:#07111f;--bg2:#0a1525;--panel:#0e1b2f;--panel2:#13243c;--text:#eef4ff;--muted:#93a4bd;--accent:#44d3a8;--accent2:#4ba3ff;--warn:#ffb454;--danger:#ff6b6b;--ok:#4bd17d;--line:#223651;--shadow:0 18px 50px rgba(0,0,0,.32);--topbar:rgba(7,17,31,.92);--nav:rgba(8,17,31,.96);--input:#0a1627;--surface:#0a1627;--surface2:#13233a;--tablehead:#0b1728;--desc:#dfe8f6;--pillborder:#253c5c;--pillOk:#97f1b2;--pillOkBorder:#2c6f44;--pillWarn:#ffd48e;--pillWarnBorder:#725025;--pillDanger:#ff9b9b;--pillDangerBorder:#6e2e2e;--toast:#101f35;--toastText:#ffffff;--overlay:rgba(0,0,0,.72);--sheet:#0c182a}
+*{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,var(--bg) 0,var(--bg2) 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100%}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;padding-bottom:84px}.topbar{position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--topbar);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:10px;align-items:center}.topActions{display:flex;gap:8px;align-items:center}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;color:#06131f}.brand h1{font-size:16px;margin:0}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:9px 11px}
+main{max-width:980px;margin:auto;padding:16px}.page{display:none}.page.active{display:block}.hero{display:flex;justify-content:space-between;gap:10px;align-items:end;margin:2px 0 14px}.hero h2{margin:0;font-size:22px}.hero p{margin:4px 0 0;color:var(--muted);font-size:13px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700;background:var(--accent);color:#06131f}.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.btn.danger{background:var(--danger);color:white}.btn.warn{background:var(--warn);color:#1a1208}.btn.small{padding:8px 10px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:27px;font-weight:800;margin-top:3px}.stat .hint{font-size:11px;color:var(--muted);margin-top:2px}.clickableCard{cursor:pointer;position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--line) 72%,var(--accent2) 28%);box-shadow:0 10px 28px rgba(28,42,62,.10),inset 0 1px 0 rgba(255,255,255,.16);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,filter .16s ease}.clickableCard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--accent),var(--accent2));opacity:.72}.clickableCard::after{content:"›";position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:25px;font-weight:800;color:var(--accent2);opacity:.48;transition:transform .16s ease,opacity .16s ease}.clickableCard .label,.clickableCard .value,.clickableCard .hint{padding-right:22px}.clickableCard:hover{border-color:var(--accent2);box-shadow:0 14px 32px rgba(28,42,62,.15),0 0 0 1px color-mix(in srgb,var(--accent2) 26%,transparent)}.clickableCard:hover::after{opacity:.85;transform:translate(2px,-50%)}.clickableCard:active{transform:scale(.972);filter:brightness(.97);box-shadow:0 4px 12px rgba(28,42,62,.11),inset 0 0 0 1px color-mix(in srgb,var(--accent) 34%,transparent)}.clickableCard:active::after{transform:translate(4px,-50%);opacity:1}@media(hover:none){.clickableCard::after{opacity:.62}}.accent{color:var(--accent)}.dangerText{color:var(--danger)}.warnText{color:var(--warn)}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 9px}.sectionTitle h3{margin:0;font-size:15px}.sectionTitle span{font-size:12px;color:var(--muted)}
+.searchbar{display:flex;gap:8px;margin-bottom:10px}.input,select,textarea{width:100%;background:var(--input);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none}.input:focus,select:focus,textarea:focus{border-color:var(--accent2)}textarea{min-height:78px;resize:vertical}.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.itemList{display:grid;gap:9px}.itemCard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:12px}.itemTop{display:flex;justify-content:space-between;gap:10px}.itemCode{font-weight:800;font-size:14px}.itemDesc{color:var(--desc);font-size:13px;margin-top:3px}.qty{font-weight:900;font-size:22px;white-space:nowrap}.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.pill{background:var(--surface2);border:1px solid var(--pillborder);color:var(--muted);border-radius:999px;padding:4px 7px;font-size:10px}.pill.ok{color:var(--pillOk);border-color:var(--pillOkBorder)}.pill.warn{color:var(--pillWarn);border-color:var(--pillWarnBorder)}.pill.danger{color:var(--pillDanger);border-color:var(--pillDangerBorder)}.itemActions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}.itemActions button{flex:1 1 42%}
+.bottomnav{position:fixed;z-index:20;bottom:0;left:0;right:0;background:var(--nav);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,1fr);padding:7px max(7px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left))}.navbtn{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:10px}.navbtn .ico{font-size:19px;line-height:1}.navbtn.active{color:var(--accent)}
+.modal{position:fixed;inset:0;z-index:50;background:var(--overlay);display:none;align-items:flex-end}.modal.open{display:flex}.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-height:92vh;overflow:auto;padding:17px 16px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.5)}.sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sheetHead h3{margin:0}.formgrid{display:grid;gap:11px}.field label{display:block;color:var(--muted);font-size:11px;margin:0 0 5px 2px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}.actions{display:flex;gap:8px;margin-top:14px}.actions>*{flex:1}
+.moveType{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.moveType button{padding:10px 4px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:11px}.moveType button.active{background:var(--accent);color:#06131f;border-color:var(--accent)}.selectedBox{padding:12px;border-radius:13px;background:var(--surface);border:1px solid var(--line);margin:9px 0}.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:14px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:15px}table{width:100%;border-collapse:collapse;min-width:680px;background:var(--panel)}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:12px}th{color:var(--muted);font-weight:700;background:var(--tablehead);position:sticky;top:0}.positive{color:var(--ok);font-weight:800}.negative{color:var(--danger);font-weight:800}
+.reorderCard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:12px;margin-bottom:9px}.reorderHead{display:flex;justify-content:space-between;gap:10px}.reorderQty{font-size:19px;font-weight:900}.progress{height:7px;border-radius:999px;background:var(--surface2);overflow:hidden;margin-top:8px}.progress>div{height:100%;background:linear-gradient(90deg,var(--danger),var(--warn),var(--accent));border-radius:999px}.reorderGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}.mini{background:var(--surface);border-radius:10px;padding:7px}.mini b{display:block;font-size:12px}.mini span{font-size:9px;color:var(--muted)}
+.chart{height:180px;display:flex;align-items:end;gap:4px;padding:12px 4px 0}.barGroup{flex:1;height:100%;display:flex;align-items:end;justify-content:center;gap:2px;position:relative}.bar{width:42%;min-width:2px;border-radius:4px 4px 0 0}.bar.in{background:var(--accent)}.bar.out{background:var(--accent2)}.legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:7px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}.dot.in{background:var(--accent)}.dot.out{background:var(--accent2)}
+.toast{position:fixed;z-index:80;left:50%;bottom:88px;transform:translateX(-50%) translateY(20px);background:var(--toast);color:var(--toastText);border:1px solid var(--line);padding:10px 14px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;box-shadow:var(--shadow);max-width:90vw;text-align:center;font-size:12px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.kpiList{display:grid;gap:8px}.kpiRow{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 11px}.kpiRow small{color:var(--muted)}
+.scanner{display:none;background:#02050a;border-radius:16px;overflow:hidden;margin-top:10px;position:relative}.scanner.open{display:block}.scanner video{width:100%;max-height:340px;display:block}.scanline{position:absolute;left:10%;right:10%;top:50%;height:2px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.labelPreview{background:#fff!important;color:#111!important;color-scheme:only light;forced-color-adjust:none;width:100%;max-width:420px;aspect-ratio:85/45;border-radius:8px;padding:10px;display:grid;grid-template-columns:1.5fr .68fr;gap:10px;margin:10px auto;align-items:center}.labelPreview h3{font-size:18px;line-height:1.05;margin:0;font-weight:900;letter-spacing:.2px}.labelPreview .desc{font-size:12px;line-height:1.18;margin-top:5px;font-weight:700}.labelPreview .category{display:inline-block;font-size:8px;line-height:1;margin-top:6px;padding:4px 6px;border:1px solid #c8c8c8;border-radius:999px;font-weight:900;letter-spacing:.55px;text-transform:uppercase;color:#333!important;background:#f5f5f5!important}.barcode{width:100%;height:39px;margin-top:7px}.barcodeText{text-align:center;font-size:8px;letter-spacing:.9px;margin-top:1px}.qrWrap{text-align:center;font-size:8px;font-weight:800;color:#111!important;color-scheme:only light;forced-color-adjust:none}.qrCode{display:block;width:88px;height:88px;max-width:100%;margin:0 auto;background:#fff!important;color-scheme:only light;forced-color-adjust:none;image-rendering:pixelated;border:0}.siteGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.siteBox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px}.siteBox b{display:block;font-size:15px}.siteBox small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.transferArrow{text-align:center;font-size:20px;color:var(--accent);font-weight:900}.codePreview{display:flex;gap:7px;align-items:center}.codePreview .input{font-weight:800;letter-spacing:.5px}.siteTag{font-size:10px;color:var(--muted)}.settingsGrid{display:grid;gap:10px}.info{font-size:12px;color:var(--muted);line-height:1.5}.divider{height:1px;background:var(--line);margin:14px 0}
+@media(min-width:720px){main{padding:22px}.stats{grid-template-columns:repeat(4,1fr)}.filters{grid-template-columns:2fr 1fr 1fr}.itemList{grid-template-columns:repeat(2,minmax(0,1fr))}.sheet{max-width:720px;margin:auto;border-radius:22px;max-height:90vh;align-self:center}.modal{align-items:center;padding:20px}.bottomnav{left:50%;right:auto;width:min(620px,96vw);transform:translateX(-50%);bottom:12px;border:1px solid var(--line);border-radius:18px;padding:7px}.app{padding-bottom:100px}.toast{bottom:108px}}
+
+.photoThumb{width:58px;height:58px;border-radius:12px;object-fit:cover;border:1px solid var(--line);background:var(--surface);flex:0 0 58px}.photoBox{display:flex;gap:12px;align-items:center}.photoPreview{width:110px;height:110px;object-fit:cover;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+.locationPath{font-size:10px;color:var(--muted);line-height:1.35;margin-top:3px}.countList{display:grid;gap:8px}.countRow{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px}.countRow .theory{font-size:11px;color:var(--muted);margin-top:3px}.countRow input{text-align:center;font-weight:800}.highlight{outline:2px solid var(--accent);outline-offset:1px}.loanCard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px;margin-top:7px}.loanCard small{color:var(--muted)}.activeLoanList{display:grid;gap:10px}.activeLoanCard{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:13px}.activeLoanHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.activeLoanQty{font-size:20px;font-weight:900;color:var(--accent2);white-space:nowrap}.activeLoanCode{font-size:12px;font-weight:900;color:var(--accent2)}.activeLoanDesc{font-size:15px;font-weight:800;margin-top:2px}.activeLoanDetails{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.activeLoanDetail{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:8px}.activeLoanDetail small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.3px}.activeLoanDetail b{display:block;font-size:12px;margin-top:3px;word-break:break-word}.activeLoanMeta{font-size:10px;color:var(--muted);margin-top:9px;line-height:1.45}.badgeTool{color:var(--accent2);border-color:var(--accent2)}.badgeCons{color:var(--accent);border-color:var(--accent)}
+.locationLabel{background:#fff!important;color:#111!important;color-scheme:only light;forced-color-adjust:none;width:100%;max-width:420px;aspect-ratio:85/45;border-radius:8px;padding:10px;display:grid;grid-template-columns:1.45fr .72fr;gap:8px;margin:10px auto;align-items:center}.locationLabel h3{font-size:16px;margin:0}.locationLabel .path{font-size:11px;line-height:1.35;margin-top:5px}.locationLabel .qrCode{width:88px;height:88px}
+
+.modebar{max-width:980px;margin:0 auto;padding:10px 16px 0}.modeSwitch{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}.modeSwitch button{border:0;border-radius:10px;padding:10px 8px;background:transparent;color:var(--muted);font-weight:800}.modeSwitch button.active{background:var(--panel);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.08)}.bottomnav.hidden{display:none}.app.scan-mode{padding-bottom:18px}
+.scanHero{display:grid;gap:12px}.scanIntro{text-align:center;padding:6px 8px}.scanIntro h2{font-size:25px;margin:3px 0 5px}.scanIntro p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}.homeScanner{position:relative;background:#02050a;border-radius:22px;overflow:hidden;min-height:330px;border:1px solid var(--line);box-shadow:var(--shadow)}.homeScanner video{display:block;width:100%;height:330px;object-fit:cover}.scanPlaceholder{height:330px;display:grid;place-items:center;text-align:center;padding:28px;color:#dce8f6;background:radial-gradient(circle at 50% 35%,#15304a 0,#07111f 55%,#02050a 100%)}.scanPlaceholder .bigScan{font-size:58px;line-height:1;margin-bottom:12px}.scanFrame{position:absolute;inset:16% 12%;border:2px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:0 0 0 999px rgba(0,0,0,.18);pointer-events:none}.scanFrame:after{content:'';position:absolute;left:8%;right:8%;top:50%;height:2px;background:var(--accent);box-shadow:0 0 14px var(--accent)}.scanStatus{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(3,10,18,.78);color:white;border-radius:11px;padding:9px 11px;font-size:11px;text-align:center;backdrop-filter:blur(8px)}.scanActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.scanManual{display:flex;gap:8px}.scanManual input{flex:1}.quickArticle{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}.quickArticle .photoThumb{width:64px;height:64px}.quickArticle .qaMain{min-width:0;flex:1}.quickArticle .qaCode{font-size:13px;font-weight:900;color:var(--accent2)}.quickArticle .qaDesc{font-size:15px;font-weight:800;margin-top:3px}.quickActionGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quickActionGrid button{min-height:54px}.operatorHint{font-size:11px;color:var(--muted);margin-top:5px}.unknownCode{word-break:break-all;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--surface);border:1px solid var(--line);padding:10px;border-radius:10px;font-size:11px}.modeHelp{font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0}
+@media(max-width:430px){.bottomnav .navbtn{font-size:9px}.bottomnav .navbtn .ico{font-size:17px}.row3{grid-template-columns:1fr 1fr}.countRow{grid-template-columns:1fr 78px}}
+@media print{body *{visibility:hidden}.labelPreview,.labelPreview *,.locationLabel,.locationLabel *{visibility:visible}.labelPreview{position:absolute;left:0;top:0;width:85mm;height:45mm;max-width:none;border-radius:0;margin:0;padding:5mm;box-shadow:none}.locationLabel{position:absolute;left:0;top:0;width:85mm;height:45mm;max-width:none;border-radius:0;margin:0;padding:5mm;box-shadow:none}.bottomnav,.topbar,.modebar{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">OS</div><div><h1>Officina Stock</h1><small id="shopNameTop">Magazzino manutenzione</small></div></div>
+    <div class="topActions"><button id="themeToggle" class="iconbtn" onclick="toggleTheme()" title="Attiva tema scuro" aria-label="Cambia tema">☾</button><button class="iconbtn" onclick="openSettings()" title="Impostazioni" aria-label="Impostazioni">⚙</button></div>
+  </header>
+  <div class="modebar"><div class="modeSwitch">
+    <button id="modeScanBtn" class="active" onclick="setAppMode('scan')">▣ Scansione rapida</button>
+    <button id="modeManageBtn" onclick="setAppMode('manage')">▦ Gestionale</button>
+  </div><div class="modeHelp" id="modeHelp">Scansiona un articolo e registra subito l'operazione.</div></div>
+  <main>
+    <section id="scanhome" class="page active"></section>
+    <section id="dashboard" class="page"></section>
+    <section id="inventory" class="page"></section>
+    <section id="movement" class="page"></section>
+    <section id="reorder" class="page"></section>
+    <section id="count" class="page"></section>
+    <section id="history" class="page"></section>
+  </main>
+  <nav id="bottomNav" class="bottomnav hidden">
+    <button class="navbtn active" data-page="dashboard"><span class="ico">⌂</span>Home</button>
+    <button class="navbtn" data-page="history"><span class="ico">☷</span>Storico</button>
+  </nav>
+</div>
+<div id="modal" class="modal"><div class="sheet" id="sheet"></div></div>
+<div id="toast" class="toast"></div>
+<script>
+/* QRCode for JavaScript, Kazuhiko Arase, MIT License. Bundled for offline use. */
+(function(g){const M={};
+M['./QRMode']=function(module,exports,require){
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+};
+M['./QRErrorCorrectLevel']=function(module,exports,require){
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+};
+M['./QRMaskPattern']=function(module,exports,require){
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+};
+M['./QRMath']=function(module,exports,require){
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+};
+M['./QRPolynomial']=function(module,exports,require){
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+};
+M['./QRRSBlock']=function(module,exports,require){
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+};
+M['./QRBitBuffer']=function(module,exports,require){
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+};
+M['./QR8bitByte']=function(module,exports,require){
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+};
+M['./QRUtil']=function(module,exports,require){
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+};
+M['./index']=function(module,exports,require){
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+				var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+};
+const C={};function R(id){if(!id.startsWith('./'))id='./'+id;if(C[id])return C[id].exports;if(!M[id])throw new Error('QR module '+id);const module={exports:{}};C[id]=module;M[id](module,module.exports,R);return module.exports}g.OfficinaQRCode=R('./index');})(window);
+</script>
+<script>
+const STORAGE_KEY='officina_stock_mobile_v2';
+const VERSION='2.7.0';
+const SITES=[{id:'ROVIGO',name:'Rovigo',short:'ROV'},{id:'CRESPINO',name:'Crespino',short:'CRE'}];
+const CATEGORY_PREFIX={'attrezzi':'ATT','sensori':'SEN','viteria':'VIT','ricambi':'RIC','elettrico':'ELE','materiale elettrico':'ELE','pneumatica':'PNE','pneumatico':'PNE','consumabili':'CON','cuscinetti':'CUS','guarnizioni':'GUA','altro':'ART'};
+const CATEGORIES=['Attrezzi','Sensori','Viteria','Ricambi','Materiale elettrico','Pneumatica','Consumabili','Cuscinetti','Guarnizioni','Altro'];
+let state=loadState();
+let ui={page:'scanhome',appMode:'scan',search:'',cat:'',stock:'',site:'',typeFilter:'',selectedItem:null,moveType:'OUT',scannerStream:null,scanBusy:false,fromSite:'ROVIGO',toSite:'CRESPINO',countSite:'ROVIGO',countLocationId:'',countValues:{},countHighlight:'',transferPrefill:0};
+applyTheme();
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function num(v,d=0){const n=parseFloat(String(v??'').replace(',','.'));return Number.isFinite(n)?n:d}
+function int(v,d=0){const n=parseInt(v,10);return Number.isFinite(n)?n:d}
+function fmt(n){return Number(n||0).toLocaleString('it-IT',{maximumFractionDigits:2})}
+function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function normalizeItemName(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ')}
+function duplicateItemByName(description,excludeId=''){const n=normalizeItemName(description);return n?state.items.find(x=>x.id!==excludeId&&normalizeItemName(x.description)===n):null}
+function isoNow(){return new Date().toISOString()}
+function dateIt(x){try{return new Date(x).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}catch{return x}}
+function siteName(id){return SITES.find(s=>s.id===id)?.name||id||'-'}
+function defaultLocations(){return [
+{id:uid(),code:'ROV-MAG',name:'Magazzino - da assegnare',area:'Officina',zone:'Officina',cabinet:'',shelf:'',drawer:'',position:'',site:'ROVIGO',notes:''},
+{id:uid(),code:'CRE-MAG',name:'Magazzino - da assegnare',area:'Officina',zone:'Officina',cabinet:'',shelf:'',drawer:'',position:'',site:'CRESPINO',notes:''}
+]}
+function initialState(){return {version:VERSION,settings:{shopName:'Magazzino manutenzione',operator:'',operatorHistory:[],safetyDays:7,defaultLead:7,theme:'light'},locations:defaultLocations(),items:[],movements:[],loans:[]}}
+function migrateState(s){
+ s=s&&typeof s==='object'?s:initialState();
+ s.settings=Object.assign(initialState().settings,s.settings||{});if(!Array.isArray(s.settings.operatorHistory))s.settings.operatorHistory=[];if(s.settings.operator&&!s.settings.operatorHistory.includes(s.settings.operator))s.settings.operatorHistory.unshift(s.settings.operator);
+ s.locations=Array.isArray(s.locations)?s.locations:[];
+ if(!s.locations.length)s.locations=defaultLocations();
+ s.locations.forEach(l=>{if(!l.site)l.site='ROVIGO';l.zone=l.zone||l.area||'';l.area=l.zone;l.cabinet=l.cabinet||'';l.shelf=l.shelf||'';l.drawer=l.drawer||'';l.position=l.position||'';l.name=l.name||'';l.notes=l.notes||''});
+ for(const site of SITES){if(!s.locations.some(l=>l.site===site.id))s.locations.push({id:uid(),code:site.short+'-MAG',name:'Magazzino - da assegnare',area:'Officina',zone:'Officina',cabinet:'',shelf:'',drawer:'',position:'',site:site.id,notes:''})}
+ const firstLoc=site=>s.locations.find(l=>l.site===site)?.id||'';
+ s.items=Array.isArray(s.items)?s.items:[];
+ s.items.forEach(i=>{if(!i.stockBySite)i.stockBySite={ROVIGO:num(i.qty),CRESPINO:0};for(const site of SITES)i.stockBySite[site.id]=num(i.stockBySite[site.id]);if(!i.siteLocationIds)i.siteLocationIds={ROVIGO:i.locationId||firstLoc('ROVIGO'),CRESPINO:firstLoc('CRESPINO')};for(const site of SITES)if(!i.siteLocationIds[site.id])i.siteLocationIds[site.id]=firstLoc(site.id);if(!i.itemType)i.itemType=String(i.category||'').toLowerCase().includes('attrezz')?'TOOL':'CONSUMABLE';if(!['TOOL','CONSUMABLE'].includes(i.itemType))i.itemType='CONSUMABLE';i.photo=i.photo||'';i.scanAliases=Array.isArray(i.scanAliases)?i.scanAliases:[];if(!i.minBySite||typeof i.minBySite!=='object'){i.minBySite={ROVIGO:0,CRESPINO:0};const lm=num(i.minQty);if(lm>0){const primary=num(i.stockBySite.CRESPINO)>num(i.stockBySite.ROVIGO)?'CRESPINO':'ROVIGO';i.minBySite[primary]=lm}}if(!i.targetBySite||typeof i.targetBySite!=='object'){i.targetBySite={ROVIGO:0,CRESPINO:0};const lx=num(i.maxQty);if(lx>0){const primary=num(i.stockBySite.CRESPINO)>num(i.stockBySite.ROVIGO)?'CRESPINO':'ROVIGO';i.targetBySite[primary]=lx}}for(const site of SITES){i.minBySite[site.id]=Math.max(0,num(i.minBySite[site.id]));i.targetBySite[site.id]=Math.max(i.minBySite[site.id],num(i.targetBySite[site.id]))}i.minQty=SITES.reduce((a,site)=>a+num(i.minBySite[site.id]),0);i.maxQty=SITES.reduce((a,site)=>a+num(i.targetBySite[site.id]),0);i.qty=SITES.reduce((a,site)=>a+num(i.stockBySite[site.id]),0)});
+ s.movements=Array.isArray(s.movements)?s.movements:[];s.movements.forEach(m=>{if(!m.site&&!m.fromSite&& !['RELOCATE'].includes(m.type))m.site='ROVIGO'});
+ s.loans=Array.isArray(s.loans)?s.loans:[];s.loans.forEach(l=>{l.remaining=num(l.remaining,l.qty);l.active=l.active!==false&&l.remaining>0});
+ s.version=VERSION;return s
+}
+function loadState(){try{const legacy=localStorage.getItem(STORAGE_KEY)||'';if(window.NativeBridge&&typeof NativeBridge.loadState==='function'){const raw=NativeBridge.loadState(legacy);if(raw)return migrateState(JSON.parse(raw))}return migrateState(legacy?JSON.parse(legacy):initialState())}catch(e){console.error('loadState',e);return initialState()}}
+function save(){state.version=VERSION;state.items.forEach(syncItem);const raw=JSON.stringify(state);if(window.NativeBridge&&typeof NativeBridge.saveState==='function'){if(!NativeBridge.saveState(raw))throw new Error('Salvataggio SQLite fallito')}else{localStorage.setItem(STORAGE_KEY,raw)}}
+function applyTheme(theme=state?.settings?.theme||'light'){const t=theme==='dark'?'dark':'light';state.settings.theme=t;document.documentElement.dataset.theme=t;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',t==='dark'?'#07111f':'#f3f6fa');const b=document.getElementById('themeToggle');if(b){b.textContent=t==='dark'?'☀':'☾';b.title=t==='dark'?'Attiva tema chiaro':'Attiva tema scuro';b.setAttribute('aria-label',b.title)}}
+function toggleTheme(){state.settings.theme=state.settings.theme==='dark'?'light':'dark';applyTheme();save();toast(state.settings.theme==='dark'?'Tema scuro attivato':'Tema chiaro attivato')}
+function locById(id){return state.locations.find(x=>x.id===id)}
+function itemById(id){return state.items.find(x=>x.id===id)}
+function siteQty(i,site){return num(i?.stockBySite?.[site])}
+function totalQty(i){return SITES.reduce((a,s)=>a+siteQty(i,s.id),0)}
+function siteMin(i,site){return Math.max(0,num(i?.minBySite?.[site]))}
+function siteTarget(i,site){return Math.max(siteMin(i,site),num(i?.targetBySite?.[site]))}
+function syncItem(i){if(i){i.qty=totalQty(i);if(!i.minBySite)i.minBySite={ROVIGO:0,CRESPINO:0};if(!i.targetBySite)i.targetBySite={ROVIGO:0,CRESPINO:0};for(const s of SITES){i.minBySite[s.id]=Math.max(0,num(i.minBySite[s.id]));i.targetBySite[s.id]=Math.max(i.minBySite[s.id],num(i.targetBySite[s.id]))}i.minQty=SITES.reduce((a,s)=>a+siteMin(i,s.id),0);i.maxQty=SITES.reduce((a,s)=>a+siteTarget(i,s.id),0)}return i}
+function itemLoc(i,site){return locById(i?.siteLocationIds?.[site])}
+function isTool(i){return i?.itemType==='TOOL'}
+function activeLoans(itemId){return state.loans.filter(l=>l.itemId===itemId&&l.active!==false&&num(l.remaining)>0)}
+function loanedQty(i){return activeLoans(i?.id).reduce((a,l)=>a+num(l.remaining),0)}
+function ownedQty(i){return totalQty(i)+loanedQty(i)}
+function locationPath(l){if(!l)return 'N/D';const parts=[siteName(l.site),l.zone,l.cabinet&&('Armadio '+l.cabinet),l.shelf&&('Scaffale '+l.shelf),l.drawer&&('Cassetto '+l.drawer),l.position&&('Pos. '+l.position)].filter(Boolean);return parts.join(' › ')||l.code||'N/D'}
+function locationShort(l){if(!l)return 'N/D';const p=[l.zone,l.cabinet&&('Arm. '+l.cabinet),l.shelf&&('Sc. '+l.shelf),l.drawer&&('Cass. '+l.drawer),l.position&&('Pos. '+l.position)].filter(Boolean);return p.join(' › ')||l.name||l.code}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2400)}
+function closeModal(){stopScanner();document.getElementById('modal').classList.remove('open')}
+function openModal(html){stopScanner();document.getElementById('sheet').innerHTML=html;document.getElementById('modal').classList.add('open')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+function categoryPrefix(category){const k=String(category||'').trim().toLowerCase();if(CATEGORY_PREFIX[k])return CATEGORY_PREFIX[k];const p=k.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').toUpperCase().slice(0,3);return (p||'ART').padEnd(3,'X')}
+function nextCode(category,excludeId=''){const p=categoryPrefix(category);let max=0;const re=new RegExp('^'+p+'-(\\d{1,8})$','i');for(const i of state.items){if(i.id===excludeId)continue;const m=String(i.code||'').match(re);if(m)max=Math.max(max,int(m[1]))}return p+'-'+String(max+1).padStart(6,'0')}
+function updateAutoCode(force=false){const c=document.querySelector('[name="category"]'),code=document.getElementById('itemCode');if(!c||!code)return;if(code.dataset.new==='1'||force)code.value=nextCode(c.value)}
+
+function consumptionStats(itemId,site=''){const now=Date.now(),d=86400000;let out30=0,prev30=0,out90=0;for(const m of state.movements){if(m.itemId!==itemId||!['OUT','ADJ-'].includes(m.type))continue;if(site&&m.site!==site)continue;const age=(now-new Date(m.at).getTime())/d;if(age>=0&&age<=30)out30+=num(m.qty);if(age>30&&age<=60)prev30+=num(m.qty);if(age>=0&&age<=90)out90+=num(m.qty)}const daily30=out30/30,daily90=out90/90;const daily=(out30>0&&out90>0)?(.65*daily30+.35*daily90):Math.max(daily30,daily90);let trend=0;if(prev30<=0&&out30>0)trend=100;else if(prev30>0)trend=((out30-prev30)/prev30)*100;return {out30,out90,daily,trend}}
+function siteForecast(item,site){const st=consumptionStats(item.id,site),qty=siteQty(item,site),min=siteMin(item,site),configuredTarget=siteTarget(item,site),lead=Math.max(0,int(item.leadTime,7)),safe=Math.max(0,int(item.safetyDays,7));const reorderPoint=Math.max(min,st.daily*(lead+safe));const target=configuredTarget>0?configuredTarget:Math.max(min,st.daily*(lead+safe+30));const coverage=st.daily>0?qty/st.daily:null;const needsAction=target>0&&qty<=reorderPoint;const need=needsAction?Math.max(0,target-qty):0;return {...st,site,qty,min,reorderPoint,target,coverage,need,needsAction}}
+function forecast(item){if(isTool(item))return {...consumptionStats(item.id),sites:{},transfers:[],purchaseBySite:{ROVIGO:0,CRESPINO:0},recommended:0,hasAction:false,priority:'Nessuna',rank:0,target:0,coverage:null};const sites={};for(const s of SITES)sites[s.id]=siteForecast(item,s.id);const virtual={ROVIGO:sites.ROVIGO.qty,CRESPINO:sites.CRESPINO.qty},transfers=[];const receivers=SITES.map(s=>sites[s.id]).filter(x=>x.needsAction&&x.need>0).sort((a,b)=>(a.qty<=0?-1:0)-(b.qty<=0?-1:0)||b.need-a.need);for(const r of receivers){const donorId=SITES.find(s=>s.id!==r.site)?.id;if(!donorId)continue;const donor=sites[donorId],surplus=Math.max(0,virtual[donorId]-donor.target),need=Math.max(0,r.target-virtual[r.site]);const q=Math.min(surplus,need);if(q>0){transfers.push({from:donorId,to:r.site,qty:q});virtual[donorId]-=q;virtual[r.site]+=q}}
+const purchaseBySite={ROVIGO:0,CRESPINO:0};for(const s of SITES){const sf=sites[s.id];if(sf.target>0&&virtual[s.id]<=sf.reorderPoint)purchaseBySite[s.id]=Math.max(0,sf.target-virtual[s.id])}const recommended=SITES.reduce((a,s)=>a+purchaseBySite[s.id],0),st=consumptionStats(item.id),coverage=st.daily>0?totalQty(item)/st.daily:null,target=SITES.reduce((a,s)=>a+sites[s.id].target,0);let priority='Nessuna',rank=0;if(recommended>0&&SITES.some(s=>virtual[s.id]<=0&&sites[s.id].target>0)){priority='Critica';rank=3}else if(recommended>0){priority='Alta';rank=2}else if(transfers.length){priority='Trasferisci';rank=1}return {...st,sites,virtual,transfers,purchaseBySite,recommended,hasAction:recommended>0||transfers.length>0,priority,rank,target,coverage}}
+function status(item){const q=totalQty(item);if(isTool(item)){const l=loanedQty(item);if(q<=0&&l>0)return ['Tutto assegnato','warn'];if(q<=0)return ['Non disponibile','danger'];return ['Disponibile','ok']}if(q<=0)return ['Esaurito','danger'];const f=forecast(item);if(f.recommended>0)return ['Sotto scorta','warn'];if(f.transfers.length)return ['Da riequilibrare','warn'];return ['OK','ok']}
+function updateModeChrome(){const scan=ui.appMode==='scan';document.querySelector('.app')?.classList.toggle('scan-mode',scan);document.getElementById('bottomNav')?.classList.toggle('hidden',scan);document.getElementById('modeScanBtn')?.classList.toggle('active',scan);document.getElementById('modeManageBtn')?.classList.toggle('active',!scan);const h=document.getElementById('modeHelp');if(h)h.textContent=scan?'Scansiona un articolo e registra subito l\'operazione.':'Anagrafiche, scorte, inventario, storico e impostazioni.'}
+function setAppMode(mode){stopScanner();ui.appMode=mode==='manage'?'manage':'scan';ui.page=ui.appMode==='scan'?'scanhome':'dashboard';updateModeChrome();render();window.scrollTo({top:0,behavior:'smooth'})}
+function nav(page){stopScanner();ui.appMode=page==='scanhome'?'scan':'manage';ui.page=page;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===page));document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));updateModeChrome();render();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>nav(b.dataset.page));
+function render(){document.getElementById('shopNameTop').textContent=state.settings.shopName||'Magazzino manutenzione';document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===ui.page));updateModeChrome();if(ui.page==='scanhome')renderScanHome();if(ui.page==='dashboard')renderDashboard();if(ui.page==='inventory')renderInventory();if(ui.page==='movement')renderMovement();if(ui.page==='reorder')renderReorder();if(ui.page==='count')renderCount();if(ui.page==='history')renderHistory()}
+function openInventoryView(opts={}){ui.search='';ui.cat='';ui.stock='';ui.site='';ui.typeFilter='';if(opts.site)ui.site=opts.site;if(opts.stock)ui.stock=opts.stock;if(opts.typeFilter)ui.typeFilter=opts.typeFilter;nav('inventory')}
+function dashOpenInventory(){openInventoryView({})}
+function dashOpenSite(site){openInventoryView({site})}
+function dashOpenLow(){openInventoryView({stock:'low'})}
+function dashOpenTools(){openActiveLoans()}
+function dashOpenReorder(){nav('reorder')}
+function dashOpenCount(){nav('count')}
+function dashOpenMovement(){nav('movement')}
+function dashOpenHistory(){nav('history')}
+function openActiveLoans(){
+ const loans=state.loans.filter(l=>l.active!==false&&num(l.remaining)>0).sort((a,b)=>new Date(b.at)-new Date(a.at));
+ const total=loans.reduce((a,l)=>a+num(l.remaining),0);
+ const cards=loans.map(l=>{const i=itemById(l.itemId);if(!i)return '';const sourceLoc=itemLoc(i,l.site);const where=[l.destination,l.machine].filter(Boolean).join(' · ')||'Non indicato';return `<div class="activeLoanCard"><div class="activeLoanHead"><div><div class="activeLoanCode">${esc(i.code)}</div><div class="activeLoanDesc">${esc(i.description)}</div></div><div class="activeLoanQty">${fmt(l.remaining)} <small style="font-size:10px;color:var(--muted)">${esc(i.unit||'pz')}</small></div></div><div class="activeLoanDetails"><div class="activeLoanDetail"><small>A chi</small><b>${esc(l.assignee||'Non indicato')}</b></div><div class="activeLoanDetail"><small>Dove / destinazione</small><b>${esc(where)}</b></div><div class="activeLoanDetail"><small>Prelevato da</small><b>${esc(siteName(l.site))}${sourceLoc?` · ${esc(sourceLoc.code||'')}`:''}</b></div><div class="activeLoanDetail"><small>ODL</small><b>${esc(l.odl||'Non indicato')}</b></div></div>${l.machine?`<div class="activeLoanMeta"><b>Macchina / impianto:</b> ${esc(l.machine)}</div>`:''}<div class="activeLoanMeta">Assegnato il ${dateIt(l.at)}${l.destination?` · Destinazione: ${esc(l.destination)}`:''}</div><button class="btn secondary small" style="width:100%;margin-top:10px" onclick="openLoanReturn('${i.id}','${l.id}')">Registra restituzione</button></div>`}).join('');
+ openModal(`<div class="sheetHead"><div><h3>Utensili in uso</h3><div class="info">${loans.length} assegnazioni attive · ${fmt(total)} unità fuori magazzino</div></div><button class="iconbtn" onclick="closeModal()">✕</button></div>${cards?`<div class="activeLoanList">${cards}</div>`:'<div class="empty">Nessun utensile risulta attualmente assegnato.</div>'}`)
+}
+function openLoanReturn(itemId,loanId){ui.selectedItem=itemId;ui.moveType='RETURN';ui.returnLoanPrefill=loanId;closeModal();nav('movement')}
+
+function renderScanHome(){const el=document.getElementById('scanhome');el.innerHTML=`<div class="scanHero"><div class="scanIntro"><h2>Scansiona e lavora</h2><p>Inquadra il QR o il barcode dell'articolo. Se è registrato scegli chi sei e cosa stai facendo; se non lo è puoi censirlo subito.</p></div><div class="homeScanner" id="homeScanner"><div id="scanPlaceholder" class="scanPlaceholder"><div><div class="bigScan">▣</div><b>Scanner pronto</b><div style="font-size:12px;margin-top:7px;opacity:.75">Consenti l'accesso alla fotocamera oppure usa i pulsanti sotto.</div></div></div><video id="homeScanVideo" autoplay playsinline muted style="display:none"></video><div id="homeScanFrame" class="scanFrame" style="display:none"></div><div class="scanStatus" id="homeScanStatus">Avvio fotocamera…</div></div><div class="scanActions"><button class="btn" onclick="startHomeScanner(false)">▣ Avvia scanner</button><button class="btn secondary" onclick="document.getElementById('captureScan').click()">⌁ Scatta / leggi</button></div><input id="captureScan" type="file" accept="image/*" capture="environment" style="display:none" onchange="scanCapturedFile(this.files[0]);this.value=''"><div class="scanManual"><input id="homeManualCode" class="input" placeholder="Codice articolo / QR / barcode" onkeydown="if(event.key==='Enter')handleHomeScan(this.value)"><button class="btn secondary" onclick="handleHomeScan(document.getElementById('homeManualCode').value)">Apri</button></div><button class="btn secondary" style="width:100%" onclick="openItemForm()">+ Registra nuovo articolo</button></div>`;setTimeout(()=>startHomeScanner(true),180)}
+function scannerFormats(){return ['code_128','qr_code','ean_13','ean_8','code_39']}
+async function startHomeScanner(silent=false){if(ui.page!=='scanhome'||ui.scanBusy)return;const status=document.getElementById('homeScanStatus'),video=document.getElementById('homeScanVideo'),placeholder=document.getElementById('scanPlaceholder'),frame=document.getElementById('homeScanFrame');if(!('BarcodeDetector' in window)){if(status)status.textContent='Scanner live non supportato: usa un lettore Bluetooth/USB o inserisci il codice.';return}if(!navigator.mediaDevices?.getUserMedia){if(status)status.textContent='Fotocamera live non disponibile qui. Prova “Scatta / leggi” oppure inserisci il codice.';return}stopScanner();try{ui.scanBusy=true;ui.scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});if(ui.page!=='scanhome'){stopScanner();ui.scanBusy=false;return}if(video){video.srcObject=ui.scannerStream;video.style.display='block';await video.play().catch(()=>{})}if(placeholder)placeholder.style.display='none';if(frame)frame.style.display='block';if(status)status.textContent='Inquadra il codice dentro il riquadro';const det=new BarcodeDetector({formats:scannerFormats()});const loop=async()=>{if(ui.page!=='scanhome'||!ui.scannerStream||!document.getElementById('homeScanVideo')){ui.scanBusy=false;return}try{const codes=await det.detect(video);if(codes.length){ui.scanBusy=false;handleHomeScan(codes[0].rawValue);return}}catch{}requestAnimationFrame(loop)};ui.scanBusy=false;requestAnimationFrame(loop)}catch(e){ui.scanBusy=false;if(status)status.textContent=silent?'Tocca “Avvia scanner” per usare la fotocamera.':'Fotocamera non autorizzata. Consenti l’accesso o usa un lettore esterno.'}}
+async function scanCapturedFile(file){if(!file)return;if(!('BarcodeDetector' in window)){toast('Il browser non supporta la lettura del codice da immagine');return}try{const bmp=await createImageBitmap(file),det=new BarcodeDetector({formats:scannerFormats()}),codes=await det.detect(bmp);bmp.close?.();if(!codes.length){toast('Nessun QR/barcode riconosciuto nella foto');return}handleHomeScan(codes[0].rawValue)}catch(e){toast('Impossibile leggere il codice dalla foto')}}
+function findItemFromScan(raw){const value=String(raw||'').trim();if(!value)return null;const p=parseScanned(value);if(p.kind==='item'){const direct=state.items.find(x=>String(x.code).toLowerCase()===String(p.code).toLowerCase());if(direct)return direct}const low=value.toLowerCase();return state.items.find(x=>(x.scanAliases||[]).some(a=>String(a).trim().toLowerCase()===low))||null}
+function handleHomeScan(raw){const value=String(raw||'').trim();if(!value){toast('Codice vuoto');return}stopScanner();const p=parseScanned(value);if(p.kind==='location'){const l=state.locations.find(x=>x.code.toLowerCase()===p.code.toLowerCase());if(l){openScannedLocation(l);return}}const i=findItemFromScan(value);if(i){openQuickArticle(i);return}openUnknownScan(value)}
+function operatorOptions(){return [...new Set([state.settings.operator,...(state.settings.operatorHistory||[])].filter(Boolean))].slice(0,12)}
+function rememberOperator(name){name=String(name||'').trim();if(!name)return;state.settings.operator=name;state.settings.operatorHistory=[name,...(state.settings.operatorHistory||[]).filter(x=>String(x).toLowerCase()!==name.toLowerCase())].slice(0,12)}
+function openQuickArticle(i){const tool=isTool(i),actions=tool?[['ASSIGN','→ Assegna'],['RETURN','← Restituisci'],['TRANSFER','⇄ Trasferisci'],['IN','+ Carico'],['ADJ+','Rettifica +'],['ADJ-','Rettifica -']]:[['OUT','− Scarico'],['IN','+ Carico'],['TRANSFER','⇄ Trasferisci'],['ADJ+','Rettifica +'],['ADJ-','Rettifica -']];openModal(`<div class="sheetHead"><h3>Articolo riconosciuto</h3><button class="iconbtn" onclick="closeModal();render()">✕</button></div><div class="quickArticle">${i.photo?`<img class="photoThumb" src="${i.photo}" alt="">`:''}<div class="qaMain"><div class="qaCode">${esc(i.code)}</div><div class="qaDesc">${esc(i.description)}</div><div class="meta"><span class="pill">Rovigo ${fmt(siteQty(i,'ROVIGO'))}</span><span class="pill">Crespino ${fmt(siteQty(i,'CRESPINO'))}</span>${tool?`<span class="pill warn">${fmt(loanedQty(i))} in uso</span>`:''}</div></div></div><div class="field" style="margin-top:13px"><label>Chi sei? *</label><input id="quickOperator" class="input" required list="operatorList" value="${esc(state.settings.operator||'')}" placeholder="Nome operatore"><datalist id="operatorList">${operatorOptions().map(x=>`<option value="${esc(x)}"></option>`).join('')}</datalist><div class="operatorHint">Il nome viene registrato nello storico del movimento.</div></div><div class="sectionTitle"><h3>Cosa stai facendo?</h3><span>${tool?'Utensile':'Consumabile'}</span></div><div class="quickActionGrid">${actions.map(a=>`<button class="btn ${a[0]==='OUT'||a[0]==='ASSIGN'?'':'secondary'}" onclick="continueQuickAction('${i.id}','${a[0]}')">${a[1]}</button>`).join('')}</div><button class="btn secondary" style="width:100%;margin-top:10px" onclick="closeModal();setTimeout(()=>startHomeScanner(false),120)">Scansiona un altro articolo</button>`)}
+function continueQuickAction(id,action){const op=String(document.getElementById('quickOperator')?.value||'').trim();if(!op){toast('Indica chi sta eseguendo l’operazione');document.getElementById('quickOperator')?.focus();return}rememberOperator(op);save();ui.selectedItem=id;ui.moveType=action;closeModal();nav('movement');setTimeout(()=>document.querySelector('#movement input[name=qty]')?.focus(),120)}
+function openUnknownScan(raw){const enc=encodeURIComponent(raw);openModal(`<div class="sheetHead"><h3>Codice non associato</h3><button class="iconbtn" onclick="closeModal();render()">✕</button></div><p class="info">Questo QR/barcode non è ancora collegato a nessun articolo.</p><div class="unknownCode">${esc(raw)}</div><div class="actions"><button class="btn secondary" onclick="closeModal();setTimeout(()=>startHomeScanner(false),120)">Riprova</button><button class="btn" onclick="registerScannedArticle(decodeURIComponent('${enc}'))">+ Registra articolo</button></div><p class="info">Se lo registri da qui, il codice appena letto verrà collegato all’articolo e sarà riconosciuto alle scansioni successive.</p>`)}
+function registerScannedArticle(raw){closeModal();openItemForm('',raw)}
+function openScannedLocation(l){openModal(`<div class="sheetHead"><h3>Ubicazione riconosciuta</h3><button class="iconbtn" onclick="closeModal();render()">✕</button></div><div class="selectedBox"><b>${esc(l.code)}</b><div class="locationPath">${esc(locationPath(l))}</div></div><div class="actions"><button class="btn secondary" onclick="closeModal();setTimeout(()=>startHomeScanner(false),120)">Continua scansione</button><button class="btn" onclick="openCountAtLocation('${l.id}')">Inventario qui</button></div>`)}
+function openCountAtLocation(id){const l=locById(id);if(!l)return;closeModal();ui.countSite=l.site;ui.countLocationId=l.id;ui.countValues={};nav('count')}
+
+function renderDashboard(){const actions=state.items.filter(i=>!isTool(i)).map(i=>({i,f:forecast(i)})).filter(x=>x.f.hasAction).sort((a,b)=>b.f.rank-a.f.rank||b.f.recommended-a.f.recommended);const low=actions.length;const recs=actions;const buyCount=actions.filter(x=>x.f.recommended>0).length;const m30=state.movements.filter(m=>Date.now()-new Date(m.at).getTime()<30*86400000).length;const total=state.items.reduce((a,i)=>a+totalQty(i),0),rov=state.items.reduce((a,i)=>a+siteQty(i,'ROVIGO'),0),cre=state.items.reduce((a,i)=>a+siteQty(i,'CRESPINO'),0);const recent=[...state.movements].sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,6);document.getElementById('dashboard').innerHTML=`
+<div class="hero"><div><h2>Dashboard</h2><p>Situazione attuale delle due sedi</p></div><div style="display:flex;gap:6px"><button class="btn secondary small" onclick="dashOpenCount()">✓ Inventario</button><button class="btn small" onclick="dashOpenMovement()">+ Movimento</button></div></div>
+<div class="grid stats">
+<div class="card stat clickableCard" onclick="dashOpenInventory()"><div class="label">Articoli</div><div class="value">${state.items.length}</div><div class="hint">tocca per aprire l'anagrafica</div></div>
+<div class="card stat clickableCard" onclick="dashOpenInventory()"><div class="label">Giacenza totale</div><div class="value">${fmt(total)}</div><div class="hint">tocca per vedere tutte le giacenze</div></div>
+<div class="card stat clickableCard" onclick="dashOpenSite('ROVIGO')"><div class="label">Rovigo</div><div class="value">${fmt(rov)}</div><div class="hint">tocca per filtrare la sede</div></div>
+<div class="card stat clickableCard" onclick="dashOpenSite('CRESPINO')"><div class="label">Crespino</div><div class="value">${fmt(cre)}</div><div class="hint">tocca per filtrare la sede</div></div>
+<div class="card stat clickableCard" onclick="dashOpenLow()"><div class="label">Sotto scorta</div><div class="value ${low?'dangerText':''}">${low}</div><div class="hint">tocca per vedere gli articoli critici</div></div>
+<div class="card stat clickableCard" onclick="dashOpenReorder()"><div class="label">Da ordinare</div><div class="value ${buyCount?'warnText':''}">${buyCount}</div><div class="hint">prima verifica i trasferimenti suggeriti</div></div>
+<div class="card stat clickableCard" onclick="dashOpenHistory()"><div class="label">Movimenti 30 gg</div><div class="value">${m30}</div><div class="hint">tocca per aprire lo storico</div></div>
+<div class="card stat clickableCard" onclick="dashOpenTools()"><div class="label">Utensili in uso</div><div class="value">${fmt(state.items.filter(isTool).reduce((a,i)=>a+loanedQty(i),0))}</div><div class="hint">tocca per vedere cosa, chi e dove</div></div>
+</div>
+<div class="sectionTitle"><h3>Andamento 14 giorni</h3><span>Carichi / scarichi reali</span></div><div class="card">${flowChart(14)}<div class="legend"><span><i class="dot in"></i>Carico</span><span><i class="dot out"></i>Scarico</span></div></div>
+<div class="sectionTitle"><h3>Priorità scorte</h3><span>${recs.length} interventi</span></div>${recs.length?recs.slice(0,4).map(x=>reorderCard(x.i,x.f,true)).join(''):'<div class="empty">Scorte equilibrate: nessun intervento suggerito.</div>'}
+<div class="sectionTitle"><h3>Ultimi movimenti</h3><button class="btn secondary small" onclick="dashOpenHistory()">Apri storico</button></div>${recent.length?'<div class="kpiList">'+recent.map(m=>{const i=itemById(m.itemId);const route=m.type==='TRANSFER'?`${siteName(m.fromSite)} → ${siteName(m.toSite)}`:siteName(m.site);const val=m.type==='TRANSFER'?`↔ ${fmt(m.qty)}`:`${['IN','ADJ+'].includes(m.type)?'+':'-'}${fmt(m.qty)}`;return `<div class="kpiRow"><div><b>${esc(i?.code||'Articolo eliminato')}</b><br><small>${dateIt(m.at)} · ${esc(route)}</small></div><div class="${m.type==='TRANSFER'?'accent':['IN','ADJ+'].includes(m.type)?'positive':'negative'}">${val}</div></div>`}).join('')+'</div>':'<div class="empty">Ancora nessun movimento.</div>'}`}
+function flowChart(days){const bins=[];let max=1;for(let n=days-1;n>=0;n--){const dt=new Date();dt.setHours(0,0,0,0);dt.setDate(dt.getDate()-n);const end=new Date(dt);end.setDate(end.getDate()+1);let cin=0,out=0;for(const m of state.movements){const t=new Date(m.at);if(t>=dt&&t<end){if(['IN','ADJ+'].includes(m.type))cin+=num(m.qty);if(['OUT','ADJ-'].includes(m.type))out+=num(m.qty)}}max=Math.max(max,cin,out);bins.push({cin,out})}return `<div class="chart">${bins.map(b=>`<div class="barGroup"><div class="bar in" style="height:${Math.max(2,b.cin/max*100)}%" title="Carico ${fmt(b.cin)}"></div><div class="bar out" style="height:${Math.max(2,b.out/max*100)}%" title="Scarico ${fmt(b.out)}"></div></div>`).join('')}</div>`}
+
+function renderInventory(){let items=[...state.items];const q=ui.search.trim().toLowerCase();if(q)items=items.filter(i=>[i.code,i.description,i.category,i.supplier,i.itemType,...SITES.map(s=>itemLoc(i,s.id)?.code||''),...SITES.map(s=>locationPath(itemLoc(i,s.id)))].join(' ').toLowerCase().includes(q));if(ui.cat)items=items.filter(i=>i.category===ui.cat);if(ui.stock==='low')items=items.filter(i=>!isTool(i)&&forecast(i).hasAction);if(ui.stock==='zero')items=items.filter(i=>totalQty(i)<=0);if(ui.site)items=items.filter(i=>siteQty(i,ui.site)>0);if(ui.typeFilter)items=items.filter(i=>i.itemType===ui.typeFilter);items.sort((a,b)=>(a.description||'').localeCompare(b.description||''));const cats=[...new Set(state.items.map(i=>i.category).filter(Boolean))].sort();document.getElementById('inventory').innerHTML=`<div class="hero"><div><h2>Articoli</h2><p>Giacenze, ubicazioni, foto e attrezzature</p></div><button class="btn small" onclick="openItemForm()">+ Articolo</button></div>
+<div class="searchbar"><input class="input" placeholder="Cerca codice, descrizione, ubicazione…" value="${esc(ui.search)}" oninput="ui.search=this.value;renderInventory()"><button class="iconbtn" onclick="openScanner('search')">▣</button></div>
+<div class="filters"><select onchange="ui.cat=this.value;renderInventory()"><option value="">Tutte le categorie</option>${cats.map(c=>`<option ${ui.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select onchange="ui.stock=this.value;renderInventory()"><option value="">Tutte le scorte</option><option value="low" ${ui.stock==='low'?'selected':''}>Sotto scorta</option><option value="zero" ${ui.stock==='zero'?'selected':''}>Senza disponibilità</option></select><select onchange="ui.site=this.value;renderInventory()"><option value="">Entrambe le sedi</option>${SITES.map(s=>`<option value="${s.id}" ${ui.site===s.id?'selected':''}>Solo ${s.name}</option>`).join('')}</select><select onchange="ui.typeFilter=this.value;renderInventory()"><option value="">Tutti i tipi</option><option value="CONSUMABLE" ${ui.typeFilter==='CONSUMABLE'?'selected':''}>Consumabili / ricambi</option><option value="TOOL" ${ui.typeFilter==='TOOL'?'selected':''}>Utensili / attrezzature</option></select></div>
+<div class="itemList">${items.length?items.map(itemCard).join(''):'<div class="empty">Nessun articolo trovato.</div>'}</div>`}
+function itemCard(i){const [txt,cls]=status(i),tool=isTool(i),loans=loanedQty(i);return `<div class="itemCard"><div class="itemTop"><div style="display:flex;gap:10px;min-width:0">${i.photo?`<img class="photoThumb" src="${i.photo}" alt="">`:''}<div><div class="itemCode">${esc(i.code)}</div><div class="itemDesc">${esc(i.description)}</div></div></div><div class="qty">${fmt(totalQty(i))} <small style="font-size:10px;color:var(--muted)">${esc(i.unit||'pz')}</small>${tool&&loans>0?`<div style="font-size:10px;color:var(--accent2);text-align:right">+ ${fmt(loans)} in uso</div>`:''}</div></div><div class="siteGrid">${SITES.map(s=>{const l=itemLoc(i,s.id);return `<div class="siteBox"><small>${s.name}</small><b>${fmt(siteQty(i,s.id))} ${esc(i.unit||'pz')}</b><small>⌖ ${esc(l?.code||'N/D')}</small><div class="locationPath">${esc(locationShort(l))}</div></div>`}).join('')}</div><div class="meta"><span class="pill ${cls}">${txt}</span><span class="pill ${tool?'badgeTool':'badgeCons'}">${tool?'Utensile':'Consumabile'}</span>${i.category?`<span class="pill">${esc(i.category)}</span>`:''}${tool&&loans>0?`<span class="pill warn">${fmt(loans)} assegnati</span>`:''}</div><div class="itemActions"><button class="btn secondary small" onclick="quickMove('${i.id}')">${tool?'Gestisci':'Movimento'}</button><button class="btn secondary small" onclick="quickTransfer('${i.id}')">Trasferisci</button><button class="btn secondary small" onclick="openLabel('${i.id}')">Etichetta</button><button class="btn secondary small" onclick="openItemForm('${i.id}')">Modifica</button></div></div>`}
+function locationOptions(site,selected){return state.locations.filter(l=>l.site===site).sort((a,b)=>locationPath(a).localeCompare(locationPath(b))).map(l=>`<option value="${l.id}" ${selected===l.id?'selected':''}>${esc(l.code)} · ${esc(locationShort(l))}</option>`).join('')}
+function openItemForm(id,scanAlias=''){const isNew=!id;const i=id?itemById(id):{id:null,code:nextCode('Altro'),description:'',category:'Altro',itemType:'CONSUMABLE',photo:'',unit:'pz',stockBySite:{ROVIGO:0,CRESPINO:0},siteLocationIds:{ROVIGO:state.locations.find(l=>l.site==='ROVIGO')?.id||'',CRESPINO:state.locations.find(l=>l.site==='CRESPINO')?.id||''},minQty:0,maxQty:0,minBySite:{ROVIGO:0,CRESPINO:0},targetBySite:{ROVIGO:0,CRESPINO:0},leadTime:state.settings.defaultLead||7,safetyDays:state.settings.safetyDays||7,supplier:'',notes:''};openModal(`<div class="sheetHead"><h3>${id?'Modifica articolo':'Nuovo articolo'}</h3><button class="iconbtn" onclick="closeModal();if(ui.page==='scanhome')render()">✕</button></div>${scanAlias?`<div class="selectedBox"><b>QR/barcode acquisito</b><div class="unknownCode" style="margin-top:7px">${esc(scanAlias)}</div><div class="info">Verrà collegato automaticamente al nuovo articolo.</div></div>`:''}<form class="formgrid" onsubmit="saveItem(event,'${id||''}')"><input type="hidden" name="scanAlias" value="${esc(scanAlias)}">
+<div class="photoBox"><img id="photoPreview" class="photoPreview" src="${i.photo||''}" alt="Foto" style="${i.photo?'':'display:none'}"><div style="flex:1"><b>Foto articolo</b><p class="info" style="margin:4px 0 8px">Scatta una foto o scegline una. Viene ridotta per non riempire subito la memoria del browser.</p><input type="hidden" name="photoData" id="photoData" value="${i.photo||''}"><input id="photoInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoInput(this)"><div class="row2"><button type="button" class="btn secondary small" onclick="document.getElementById('photoInput').click()">📷 Foto</button><button type="button" class="btn secondary small" onclick="removeItemPhoto()">Rimuovi</button></div></div></div>
+<div class="row2"><div class="field"><label>Codice automatico</label><div class="codePreview"><input id="itemCode" class="input" name="code" readonly data-new="${isNew?'1':'0'}" value="${esc(i.code)}">${isNew?'<button type="button" class="iconbtn" onclick="updateAutoCode(true)">↻</button>':''}</div></div><div class="field"><label>Tipo articolo</label><select name="itemType"><option value="CONSUMABLE" ${i.itemType!=='TOOL'?'selected':''}>Consumabile / ricambio</option><option value="TOOL" ${i.itemType==='TOOL'?'selected':''}>Utensile / attrezzatura</option></select></div></div>
+<div class="row2"><div class="field"><label>Categoria</label><select name="category" onchange="updateAutoCode()">${[...new Set([...CATEGORIES,i.category].filter(Boolean))].map(c=>`<option value="${esc(c)}" ${i.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="field"><label>Descrizione *</label><input class="input" name="description" required value="${esc(i.description)}"></div></div>
+<div class="row2"><div class="field"><label>Unità</label><select name="unit">${['pz','m','kg','l','conf','kit'].map(u=>`<option ${i.unit===u?'selected':''}>${u}</option>`).join('')}</select></div><div class="field"><label>Politica scorte</label><div class="selectedBox" style="margin:0;padding:10px">Minimo e target sono separati per sede.</div></div></div>
+<div class="card"><b>Rovigo</b><div class="row2" style="margin-top:8px"><div class="field"><label>Disponibile in magazzino</label><input class="input" type="number" step="0.01" min="0" name="qtyRovigo" value="${siteQty(i,'ROVIGO')}" ${id?'readonly':''}></div><div class="field"><label>Ubicazione</label><select name="locRovigo">${locationOptions('ROVIGO',i.siteLocationIds?.ROVIGO)}</select></div></div><div class="row2" style="margin-top:8px"><div class="field"><label>Scorta minima Rovigo</label><input class="input" type="number" step="0.01" min="0" name="minRovigo" value="${siteMin(i,'ROVIGO')}"></div><div class="field"><label>Target Rovigo</label><input class="input" type="number" step="0.01" min="0" name="targetRovigo" value="${siteTarget(i,'ROVIGO')}"></div></div></div>
+<div class="card"><b>Crespino</b><div class="row2" style="margin-top:8px"><div class="field"><label>Disponibile in magazzino</label><input class="input" type="number" step="0.01" min="0" name="qtyCrespino" value="${siteQty(i,'CRESPINO')}" ${id?'readonly':''}></div><div class="field"><label>Ubicazione</label><select name="locCrespino">${locationOptions('CRESPINO',i.siteLocationIds?.CRESPINO)}</select></div></div><div class="row2" style="margin-top:8px"><div class="field"><label>Scorta minima Crespino</label><input class="input" type="number" step="0.01" min="0" name="minCrespino" value="${siteMin(i,'CRESPINO')}"></div><div class="field"><label>Target Crespino</label><input class="input" type="number" step="0.01" min="0" name="targetCrespino" value="${siteTarget(i,'CRESPINO')}"></div></div></div>
+<div class="row2"><div class="field"><label>Lead time fornitore (gg)</label><input class="input" type="number" name="leadTime" value="${int(i.leadTime,7)}"></div><div class="field"><label>Scorta sicurezza (gg)</label><input class="input" type="number" name="safetyDays" value="${int(i.safetyDays,7)}"></div></div>
+<div class="field"><label>Fornitore</label><input class="input" name="supplier" value="${esc(i.supplier)}"></div><div class="field"><label>Note</label><textarea name="notes">${esc(i.notes)}</textarea></div>
+<div class="actions">${id?`<button type="button" class="btn danger" onclick="deleteItem('${id}')">Elimina</button>`:''}<button class="btn" type="submit" name="afterSave" value="save">Salva</button>${isNew?'<button class="btn secondary" type="submit" name="afterSave" value="print">Salva e stampa etichetta</button>':''}</div></form>`)}
+function handlePhotoInput(input){const file=input.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){toast('Seleziona un file immagine');return}const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const max=640,scale=Math.min(1,max/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*scale)),h=Math.max(1,Math.round(im.height*scale)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);const data=c.toDataURL('image/jpeg',.68);document.getElementById('photoData').value=data;const p=document.getElementById('photoPreview');p.src=data;p.style.display='block';toast('Foto pronta')};im.src=r.result};r.readAsDataURL(file)}
+function removeItemPhoto(){document.getElementById('photoData').value='';const p=document.getElementById('photoPreview');p.src='';p.style.display='none'}
+function saveItem(e,id){e.preventDefault();const afterSave=e.submitter?.value||'save',f=new FormData(e.target),category=String(f.get('category')).trim()||'Altro',description=String(f.get('description')).trim();if(!description){toast('Inserisci la descrizione dell’articolo');return}const duplicate=duplicateItemByName(description,id);if(duplicate){const qR=fmt(siteQty(duplicate,'ROVIGO')),qC=fmt(siteQty(duplicate,'CRESPINO'));toast(`Articolo già presente · ${duplicate.code}`);if(confirm(`Articolo già presente in archivio:
+
+${duplicate.code} · ${duplicate.description}
+Rovigo: ${qR} ${duplicate.unit||'pz'}
+Crespino: ${qC} ${duplicate.unit||'pz'}
+
+Vuoi aprire l’articolo esistente?`)){closeModal();setTimeout(()=>openItemForm(duplicate.id),50)}return}let savedId=id||'';let code=id?itemById(id).code:nextCode(category);if(state.items.some(x=>x.code.toLowerCase()===code.toLowerCase()&&x.id!==id)){code=nextCode(category);if(state.items.some(x=>x.code.toLowerCase()===code.toLowerCase()&&x.id!==id)){toast('Impossibile generare un codice univoco');return}}const scanAlias=String(f.get('scanAlias')||'').trim(),existingAliases=id?(itemById(id)?.scanAliases||[]):[];const data={code,description,category,itemType:String(f.get('itemType'))==='TOOL'?'TOOL':'CONSUMABLE',photo:String(f.get('photoData')||''),scanAliases:[...new Set([...existingAliases,...(scanAlias?[scanAlias]:[])])],unit:String(f.get('unit')),siteLocationIds:{ROVIGO:String(f.get('locRovigo')||''),CRESPINO:String(f.get('locCrespino')||'')},minBySite:{ROVIGO:num(f.get('minRovigo')),CRESPINO:num(f.get('minCrespino'))},targetBySite:{ROVIGO:Math.max(num(f.get('minRovigo')),num(f.get('targetRovigo'))),CRESPINO:Math.max(num(f.get('minCrespino')),num(f.get('targetCrespino')))},minQty:num(f.get('minRovigo'))+num(f.get('minCrespino')),maxQty:Math.max(num(f.get('minRovigo')),num(f.get('targetRovigo')))+Math.max(num(f.get('minCrespino')),num(f.get('targetCrespino'))),leadTime:int(f.get('leadTime'),7),safetyDays:int(f.get('safetyDays'),7),supplier:String(f.get('supplier')).trim(),notes:String(f.get('notes')).trim()};if(id){const item=itemById(id),oldLoc={...item.siteLocationIds};Object.assign(item,data);syncItem(item);for(const s of SITES){const from=oldLoc[s.id]||'',to=data.siteLocationIds[s.id]||'';if(from&&to&&from!==to){state.movements.push({id:uid(),itemId:id,type:'RELOCATE',site:s.id,qty:siteQty(item,s.id),fromLocationId:from,toLocationId:to,before:siteQty(item,s.id),after:siteQty(item,s.id),operator:state.settings.operator||'',reference:'SPOSTAMENTO UBICAZIONE',note:'Ubicazione articolo aggiornata',at:isoNow()})}}}else{const ni={id:uid(),stockBySite:{ROVIGO:num(f.get('qtyRovigo')),CRESPINO:num(f.get('qtyCrespino'))},createdAt:isoNow(),...data};savedId=ni.id;syncItem(ni);state.items.push(ni);for(const s of SITES){const q=siteQty(ni,s.id);if(q>0)state.movements.push({id:uid(),itemId:ni.id,type:'IN',site:s.id,locationId:ni.siteLocationIds[s.id],qty:q,before:0,after:q,overallBefore:0,overallAfter:totalQty(ni),operator:state.settings.operator||'',reference:'GIACENZA INIZIALE',note:'Creazione articolo',at:isoNow()})}}try{save()}catch(err){toast('Memoria locale piena: riduci/rimuovi alcune foto ed esporta un backup');return}closeModal();render();if(afterSave==='print'&&savedId){openLabel(savedId);toast(`Articolo salvato · ${code} · etichetta pronta`)}else{toast(`Articolo salvato · ${code}`)}}
+function deleteItem(id){if(!confirm('Eliminare questo articolo, lo storico e le assegnazioni collegate?'))return;state.items=state.items.filter(x=>x.id!==id);state.movements=state.movements.filter(x=>x.itemId!==id);state.loans=state.loans.filter(x=>x.itemId!==id);save();closeModal();render();toast('Articolo eliminato')}
+
+function renderMovement(){const i=itemById(ui.selectedItem);document.getElementById('movement').innerHTML=`<div class="hero"><div><h2>Movimenti</h2><p>Carico, scarico, utensili e trasferimenti</p></div></div><div class="card"><div class="searchbar"><input id="moveSearch" class="input" placeholder="Codice o descrizione articolo" oninput="movementSearch(this.value)"><button class="iconbtn" onclick="openScanner('movement')">▣</button></div><div id="moveResults"></div>${i?selectedMoveBox(i):'<div class="empty">Cerca o scansiona un articolo.</div>'}</div>`}
+function movementSearch(q){const box=document.getElementById('moveResults');q=q.trim().toLowerCase();if(!q){box.innerHTML='';return}const arr=state.items.filter(i=>(i.code+' '+i.description).toLowerCase().includes(q)).slice(0,8);box.innerHTML=arr.map(i=>`<button class="kpiRow" style="width:100%;color:var(--text)" onclick="selectMoveItem('${i.id}')"><span><b>${esc(i.code)}</b><br><small>${esc(i.description)}</small></span><b>${fmt(totalQty(i))} ${esc(i.unit)}</b></button>`).join('')}
+function selectMoveItem(id){ui.selectedItem=id;const i=itemById(id);if(isTool(i)&&!['IN','ASSIGN','RETURN','TRANSFER','ADJ+','ADJ-'].includes(ui.moveType))ui.moveType='ASSIGN';if(!isTool(i)&&['ASSIGN','RETURN'].includes(ui.moveType))ui.moveType='OUT';renderMovement()}
+function selectedMoveBox(i){const tool=isTool(i);if(tool&&!['IN','ASSIGN','RETURN','TRANSFER','ADJ+','ADJ-'].includes(ui.moveType))ui.moveType='ASSIGN';if(!tool&&['ASSIGN','RETURN'].includes(ui.moveType))ui.moveType='OUT';const isT=ui.moveType==='TRANSFER',buttons=tool?[['ASSIGN','ASSEGNA'],['RETURN','RESTITUISCI'],['TRANSFER','TRASFERISCI'],['IN','CARICO'],['ADJ+','RETT. +'],['ADJ-','RETT. -']]:[['IN','CARICO'],['OUT','SCARICO'],['TRANSFER','TRASFERISCI'],['ADJ+','RETT. +'],['ADJ-','RETT. -']];return `<div class="selectedBox"><b>${esc(i.code)}</b> · ${esc(i.description)} <span class="pill ${tool?'badgeTool':'badgeCons'}">${tool?'Utensile':'Consumabile'}</span><div class="siteGrid">${SITES.map(s=>`<div class="siteBox"><small>${s.name}</small><b>${fmt(siteQty(i,s.id))} ${esc(i.unit)}</b><small>${esc(itemLoc(i,s.id)?.code||'N/D')}</small><div class="locationPath">${esc(locationShort(itemLoc(i,s.id)))}</div></div>`).join('')}</div>${tool?`<div class="meta"><span class="pill">Totale proprietà: ${fmt(ownedQty(i))}</span><span class="pill warn">In uso: ${fmt(loanedQty(i))}</span></div>${activeLoans(i.id).map(l=>`<div class="loanCard"><b>${fmt(l.remaining)} ${esc(i.unit)} → ${esc(l.assignee||l.destination||'assegnato')}</b><br><small>${esc(l.machine||'')}${l.odl?` · ODL ${esc(l.odl)}`:''} · ${dateIt(l.at)}</small></div>`).join('')}`:''}</div><form onsubmit="saveMovement(event,'${i.id}')"><div class="moveType">${buttons.map(x=>`<button type="button" class="${ui.moveType===x[0]?'active':''}" onclick="ui.moveType='${x[0]}';renderMovement()">${x[1]}</button>`).join('')}</div><div class="formgrid" style="margin-top:11px">${isT?transferFields(i):ui.moveType==='ASSIGN'?assignFields(i):ui.moveType==='RETURN'?returnFields(i):normalMoveFields(i)}<div class="row2"><div class="field"><label>Operatore</label><input class="input" name="operator" value="${esc(state.settings.operator||'')}"></div><div class="field"><label>Riferimento / DDT</label><input class="input" name="reference" placeholder="Riferimento libero"></div></div><div class="field"><label>Nota</label><textarea name="note" placeholder="Motivo del movimento"></textarea></div><button class="btn" type="submit">Registra operazione</button></div></form>`}
+function normalMoveFields(i){const out=ui.moveType==='OUT';return `<div class="row2"><div class="field"><label>Sede *</label><select name="site">${SITES.map(s=>`<option value="${s.id}">${s.name} · ${fmt(siteQty(i,s.id))} ${esc(i.unit)}</option>`).join('')}</select></div><div class="field"><label>Quantità *</label><input class="input" name="qty" type="number" step="0.01" min="0.01" required autofocus></div></div>${out?`<div class="row2"><div class="field"><label>Macchina / impianto</label><input class="input" name="machine" placeholder="Linea, macchina, impianto…"></div><div class="field"><label>ODL</label><input class="input" name="odl" placeholder="Ordine di lavoro"></div></div>`:''}`}
+function transferFields(i){if(ui.fromSite===ui.toSite)ui.toSite=ui.fromSite==='ROVIGO'?'CRESPINO':'ROVIGO';const pre=Math.min(siteQty(i,ui.fromSite),Math.max(0,num(ui.transferPrefill)));return `<div class="row2"><div class="field"><label>Da *</label><select name="fromSite" onchange="ui.fromSite=this.value;if(ui.toSite===this.value)ui.toSite=this.value==='ROVIGO'?'CRESPINO':'ROVIGO';renderMovement()">${SITES.map(s=>`<option value="${s.id}" ${ui.fromSite===s.id?'selected':''}>${s.name} · ${fmt(siteQty(i,s.id))} ${esc(i.unit)}</option>`).join('')}</select></div><div class="field"><label>A *</label><select name="toSite" onchange="ui.toSite=this.value;renderMovement()">${SITES.map(s=>`<option value="${s.id}" ${ui.toSite===s.id?'selected':''}>${s.name}</option>`).join('')}</select></div></div><div class="transferArrow">↓</div><div class="field"><label>Quantità da trasferire *</label><input class="input" name="qty" type="number" step="0.01" min="0.01" max="${siteQty(i,ui.fromSite)}" value="${pre>0?pre:''}" required autofocus></div><p class="info">Il trasferimento sposta la giacenza senza essere conteggiato come consumo o acquisto.</p>`}
+function assignFields(i){return `<div class="row2"><div class="field"><label>Preleva da *</label><select name="site">${SITES.map(s=>`<option value="${s.id}">${s.name} · ${fmt(siteQty(i,s.id))} disponibili</option>`).join('')}</select></div><div class="field"><label>Quantità *</label><input class="input" name="qty" type="number" step="0.01" min="0.01" required></div></div><div class="row2"><div class="field"><label>Assegnato a *</label><input class="input" name="assignee" required placeholder="Persona / reparto"></div><div class="field"><label>Destinazione</label><input class="input" name="destination" placeholder="Reparto / area"></div></div><div class="row2"><div class="field"><label>Macchina / impianto</label><input class="input" name="machine" placeholder="Macchina o linea"></div><div class="field"><label>ODL</label><input class="input" name="odl" placeholder="Ordine di lavoro"></div></div>`}
+function returnFields(i){const loans=activeLoans(i.id);if(!loans.length)return `<div class="empty">Non risultano utensili assegnati da restituire.</div><input type="hidden" name="qty" value="0">`;const pref=loans.some(l=>l.id===ui.returnLoanPrefill)?ui.returnLoanPrefill:'';const selected=pref?loans.find(l=>l.id===pref):loans[0];return `<div class="field"><label>Assegnazione da chiudere *</label><select name="loanId" onchange="ui.returnLoanPrefill=this.value;renderMovement()">${loans.map(l=>`<option value="${l.id}" ${l.id===pref?'selected':''}>${fmt(l.remaining)} ${esc(i.unit)} · ${esc(l.assignee||l.destination||'assegnato')} · ${esc(siteName(l.site))}</option>`).join('')}</select></div>${selected?`<div class="selectedBox"><b>${esc(selected.assignee||'Assegnatario non indicato')}</b><div class="info">${esc(selected.destination||'Destinazione non indicata')}${selected.machine?` · ${esc(selected.machine)}`:''}${selected.odl?` · ODL ${esc(selected.odl)}`:''}</div></div>`:''}<div class="row2"><div class="field"><label>Rientra a *</label><select name="site">${SITES.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div><div class="field"><label>Quantità restituita *</label><input class="input" name="qty" type="number" step="0.01" min="0.01" max="${selected?num(selected.remaining):''}" value="${selected?fmt(selected.remaining):''}" required></div></div>`}
+function quickMove(id){ui.selectedItem=id;ui.moveType=isTool(itemById(id))?'ASSIGN':'OUT';closeModal();nav('movement')}
+function quickTransfer(id){ui.selectedItem=id;ui.moveType='TRANSFER';ui.transferPrefill=0;const i=itemById(id);ui.fromSite=siteQty(i,'ROVIGO')>0?'ROVIGO':'CRESPINO';ui.toSite=ui.fromSite==='ROVIGO'?'CRESPINO':'ROVIGO';closeModal();nav('movement')}
+function startSuggestedTransfer(id,from,to,qty){ui.selectedItem=id;ui.moveType='TRANSFER';ui.fromSite=from;ui.toSite=to;ui.transferPrefill=qty;closeModal();nav('movement')}
+function saveMovement(e,id){e.preventDefault();const i=itemById(id),f=new FormData(e.target),q=num(f.get('qty'));if(q<=0){toast('Inserisci una quantità valida');return}const operator=String(f.get('operator')).trim(),reference=String(f.get('reference')).trim(),note=String(f.get('note')).trim();if(ui.moveType==='TRANSFER'){const from=String(f.get('fromSite')),to=String(f.get('toSite'));if(from===to){toast('La sede di partenza e arrivo devono essere diverse');return}const bf=siteQty(i,from),bt=siteQty(i,to);if(q>bf){toast(`Trasferimento impossibile: a ${siteName(from)} ci sono ${fmt(bf)} ${i.unit}`);return}i.stockBySite[from]=bf-q;i.stockBySite[to]=bt+q;syncItem(i);state.movements.push({id:uid(),itemId:id,type:'TRANSFER',qty:q,fromSite:from,toSite:to,fromLocationId:i.siteLocationIds?.[from]||'',toLocationId:i.siteLocationIds?.[to]||'',beforeFrom:bf,afterFrom:bf-q,beforeTo:bt,afterTo:bt+q,overallBefore:totalQty(i),overallAfter:totalQty(i),operator,reference,note,at:isoNow()});ui.transferPrefill=0;save();renderMovement();toast(`${fmt(q)} ${i.unit} trasferiti: ${siteName(from)} → ${siteName(to)}`)}else if(ui.moveType==='ASSIGN'){if(!isTool(i)){toast('Operazione disponibile solo per utensili');return}const site=String(f.get('site')),before=siteQty(i,site);if(q>before){toast(`Disponibilità insufficiente a ${siteName(site)}`);return}const assignee=String(f.get('assignee')).trim(),destination=String(f.get('destination')).trim(),machine=String(f.get('machine')).trim(),odl=String(f.get('odl')).trim();if(!assignee){toast('Indica a chi viene assegnato');return}i.stockBySite[site]=before-q;syncItem(i);const loan={id:uid(),itemId:id,qty:q,remaining:q,site,assignee,destination,machine,odl,at:isoNow(),active:true};state.loans.push(loan);state.movements.push({id:uid(),itemId:id,type:'ASSIGN',site,locationId:i.siteLocationIds?.[site]||'',qty:q,before,after:before-q,operator,reference,note,assignee,destination,machine,odl,loanId:loan.id,at:isoNow()});save();renderMovement();toast('Utensile assegnato')}else if(ui.moveType==='RETURN'){if(!isTool(i)){toast('Operazione disponibile solo per utensili');return}const loan=state.loans.find(l=>l.id===String(f.get('loanId'))&&l.active!==false);if(!loan){toast('Assegnazione non trovata');return}if(q>num(loan.remaining)){toast(`Puoi restituire al massimo ${fmt(loan.remaining)} ${i.unit}`);return}const site=String(f.get('site')),before=siteQty(i,site);i.stockBySite[site]=before+q;loan.remaining=num(loan.remaining)-q;if(loan.remaining<=0){loan.remaining=0;loan.active=false;loan.returnedAt=isoNow()}syncItem(i);state.movements.push({id:uid(),itemId:id,type:'RETURN',site,locationId:i.siteLocationIds?.[site]||'',qty:q,before,after:before+q,operator,reference,note,assignee:loan.assignee,destination:loan.destination,machine:loan.machine,odl:loan.odl,loanId:loan.id,at:isoNow()});ui.returnLoanPrefill='';save();renderMovement();toast('Restituzione registrata')}else{const site=String(f.get('site')),before=siteQty(i,site),overallBefore=totalQty(i),subtract=['OUT','ADJ-'].includes(ui.moveType);if(subtract&&q>before){toast(`Scarico impossibile: a ${siteName(site)} ci sono ${fmt(before)} ${i.unit}`);return}const after=subtract?before-q:before+q;i.stockBySite[site]=after;syncItem(i);const machine=String(f.get('machine')||'').trim(),odl=String(f.get('odl')||'').trim();state.movements.push({id:uid(),itemId:id,type:ui.moveType,site,locationId:i.siteLocationIds?.[site]||'',qty:q,before,after,overallBefore,overallAfter:totalQty(i),operator,reference,note,machine,odl,at:isoNow()});save();renderMovement();toast('Movimento registrato')}if(operator)rememberOperator(operator);save()}
+
+function renderReorder(){const arr=state.items.filter(i=>!isTool(i)).map(i=>({i,f:forecast(i)})).filter(x=>x.f.hasAction).sort((a,b)=>b.f.rank-a.f.rank||b.f.recommended-a.f.recommended);const transferCount=arr.reduce((a,x)=>a+x.f.transfers.length,0),buyCount=arr.filter(x=>x.f.recommended>0).length;document.getElementById('reorder').innerHTML=`<div class="hero"><div><h2>Scorte consigliate</h2><p>Prima riequilibra Rovigo e Crespino; acquista solo ciò che manca davvero</p></div></div><div class="grid stats" style="margin-bottom:12px"><div class="card stat"><div class="label">Trasferimenti suggeriti</div><div class="value">${transferCount}</div><div class="hint">tra le due sedi</div></div><div class="card stat"><div class="label">Articoli da acquistare</div><div class="value ${buyCount?'warnText':''}">${buyCount}</div><div class="hint">dopo il riequilibrio</div></div></div>${arr.length?arr.map(x=>reorderCard(x.i,x.f,false)).join(''):'<div class="empty">Le scorte delle due sedi risultano equilibrate.</div>'}<div class="card" style="margin-top:12px"><b>Come viene calcolato</b><p class="info">Ogni sede ha una propria scorta minima e un proprio target. Il consumo viene calcolato separatamente per Rovigo e Crespino. Se una sede è sotto soglia e l'altra ha materiale sopra il proprio target, Officina Stock suggerisce prima il trasferimento. Solo l'eventuale quantità ancora mancante viene proposta come acquisto. I trasferimenti non vengono conteggiati come consumo.</p></div>`}
+function reorderCard(i,f,compact){const p=f.priority==='Critica'?'danger':f.priority==='Alta'?'warn':'ok',transferHtml=f.transfers.map(t=>`<div class="selectedBox" style="margin-top:9px"><b>⇄ Trasferisci ${fmt(Math.ceil(t.qty))} ${esc(i.unit)} · ${siteName(t.from)} → ${siteName(t.to)}</b>${compact?'':`<div class="info" style="margin-top:4px">Usa la giacenza già disponibile prima di effettuare un acquisto.</div><button class="btn secondary small" style="margin-top:8px;width:100%" onclick="startSuggestedTransfer('${i.id}','${t.from}','${t.to}',${t.qty})">Apri trasferimento</button>`}</div>`).join(''),buyHtml=f.recommended>0?`<div class="selectedBox" style="margin-top:9px"><b>+ Acquista ${fmt(Math.ceil(f.recommended))} ${esc(i.unit)}</b>${compact?'':`<div class="info" style="margin-top:4px">${SITES.filter(s=>f.purchaseBySite[s.id]>0).map(s=>`${s.name}: ${fmt(Math.ceil(f.purchaseBySite[s.id]))} ${esc(i.unit)}`).join(' · ')}</div>`}</div>`:'';return `<div class="reorderCard"><div class="reorderHead"><div><b>${esc(i.code)}</b><div class="itemDesc">${esc(i.description)}</div><div class="meta"><span class="pill ${p}">${f.priority}</span>${i.supplier?`<span class="pill">${esc(i.supplier)}</span>`:''}</div></div><div class="reorderQty">${f.recommended>0?'+'+fmt(Math.ceil(f.recommended)):'⇄'}<small style="font-size:10px;color:var(--muted)">${f.recommended>0?' '+esc(i.unit):' trasferisci'}</small></div></div>${transferHtml}${buyHtml}${compact?'':`<div class="siteGrid">${SITES.map(s=>{const sf=f.sites[s.id];return `<div class="siteBox"><small>${s.name}</small><b>${fmt(sf.qty)} ${esc(i.unit)}</b><small>Min ${fmt(sf.min)} · Target ${fmt(sf.target)}</small><div class="locationPath">Consumo 30 gg: ${fmt(sf.out30)} · Copertura: ${sf.coverage===null?'n.d.':fmt(sf.coverage)+' gg'}</div></div>`}).join('')}</div>`}</div>`}
+
+function renderCount(){const locs=state.locations.filter(l=>l.site===ui.countSite).sort((a,b)=>locationPath(a).localeCompare(locationPath(b)));if(!locs.some(l=>l.id===ui.countLocationId))ui.countLocationId=locs[0]?.id||'';const loc=locById(ui.countLocationId),items=loc?state.items.filter(i=>i.siteLocationIds?.[ui.countSite]===loc.id).sort((a,b)=>(a.description||'').localeCompare(b.description||'')):[];const entered=items.filter(i=>Object.prototype.hasOwnProperty.call(ui.countValues,i.id)&&String(ui.countValues[i.id])!=='').length;document.getElementById('count').innerHTML=`<div class="hero"><div><h2>Inventario guidato</h2><p>Conta una posizione e registra solo le differenze</p></div><button class="btn secondary small" onclick="openScanner('countLocation')">▣ QR posizione</button></div><div class="card formgrid"><div class="row2"><div class="field"><label>Sede</label><select onchange="ui.countSite=this.value;ui.countLocationId='';ui.countValues={};renderCount()">${SITES.map(s=>`<option value="${s.id}" ${ui.countSite===s.id?'selected':''}>${s.name}</option>`).join('')}</select></div><div class="field"><label>Ubicazione</label><select onchange="ui.countLocationId=this.value;ui.countValues={};renderCount()">${locs.map(l=>`<option value="${l.id}" ${ui.countLocationId===l.id?'selected':''}>${esc(l.code)} · ${esc(locationShort(l))}</option>`).join('')}</select></div></div>${loc?`<div class="selectedBox"><b>${esc(loc.code)}</b><div class="locationPath">${esc(locationPath(loc))}</div></div>`:''}<div class="row2"><button class="btn secondary" onclick="openScanner('countItem')">▣ Scansiona articolo</button><button class="btn secondary" onclick="fillTheoreticalCounts()">= Copia teorico</button></div></div><div class="sectionTitle"><h3>Articoli nella posizione</h3><span>${entered}/${items.length} contati</span></div>${items.length?`<div class="countList">${items.map(i=>`<div id="count_${i.id}" class="countRow ${ui.countHighlight===i.id?'highlight':''}"><div><b>${esc(i.code)}</b><div class="itemDesc">${esc(i.description)}</div><div class="theory">Teorico: <b>${fmt(siteQty(i,ui.countSite))} ${esc(i.unit)}</b>${isTool(i)&&loanedQty(i)>0?` · ${fmt(loanedQty(i))} in uso (non inclusi)` :''}</div></div><input class="input" type="number" min="0" step="0.01" placeholder="Reale" value="${Object.prototype.hasOwnProperty.call(ui.countValues,i.id)?esc(ui.countValues[i.id]):''}" oninput="ui.countValues['${i.id}']=this.value"></div>`).join('')}</div><button class="btn" style="width:100%;margin-top:12px" onclick="applyInventory()">Applica rettifiche (${entered})</button>`:'<div class="empty">Nessun articolo assegnato a questa ubicazione.</div>'}`}
+function fillTheoreticalCounts(){const loc=locById(ui.countLocationId);if(!loc)return;state.items.filter(i=>i.siteLocationIds?.[ui.countSite]===loc.id).forEach(i=>ui.countValues[i.id]=String(siteQty(i,ui.countSite)));renderCount();toast('Valori teorici copiati')}
+function applyInventory(){const loc=locById(ui.countLocationId);if(!loc){toast('Seleziona una ubicazione');return}let n=0,checked=0;for(const i of state.items.filter(i=>i.siteLocationIds?.[ui.countSite]===loc.id)){if(!Object.prototype.hasOwnProperty.call(ui.countValues,i.id)||String(ui.countValues[i.id]).trim()==='')continue;checked++;const actual=num(ui.countValues[i.id],-1);if(actual<0){toast('Una quantità inventariata non è valida');return}const before=siteQty(i,ui.countSite),diff=actual-before;if(Math.abs(diff)<1e-9)continue;i.stockBySite[ui.countSite]=actual;syncItem(i);state.movements.push({id:uid(),itemId:i.id,type:diff>0?'ADJ+':'ADJ-',site:ui.countSite,locationId:loc.id,qty:Math.abs(diff),before,after:actual,overallBefore:totalQty(i)-diff,overallAfter:totalQty(i),operator:state.settings.operator||'',reference:'INVENTARIO',note:`Conteggio fisico · ${locationPath(loc)}`,at:isoNow()});n++}if(!checked){toast('Inserisci almeno una quantità reale');return}save();ui.countValues={};ui.countHighlight='';renderCount();toast(n?`${n} rettifiche registrate`:'Inventario verificato: nessuna differenza')}
+
+function movementTypeLabel(m){return {IN:'Carico',OUT:'Scarico','ADJ+':'Rettifica +','ADJ-':'Rettifica -',TRANSFER:'Trasferimento',ASSIGN:'Assegnazione',RETURN:'Restituzione',RELOCATE:'Cambio ubicazione'}[m.type]||m.type}
+function historyRoute(m){if(m.type==='TRANSFER')return `${siteName(m.fromSite)} → ${siteName(m.toSite)}`;if(m.type==='ASSIGN')return `${siteName(m.site)} → ${m.assignee||m.destination||'assegnato'}`;if(m.type==='RETURN')return `${m.assignee||'assegnato'} → ${siteName(m.site)}`;if(m.type==='RELOCATE')return `${siteName(m.site)} · ${locationShort(locById(m.fromLocationId))} → ${locationShort(locById(m.toLocationId))}`;return siteName(m.site)}
+function historyBeforeAfter(m){if(m.type==='TRANSFER')return `${siteName(m.fromSite)} ${fmt(m.beforeFrom)}→${fmt(m.afterFrom)} | ${siteName(m.toSite)} ${fmt(m.beforeTo)}→${fmt(m.afterTo)}`;if(m.type==='RELOCATE')return 'giacenza invariata';return `${fmt(m.before)} → ${fmt(m.after)}`}
+function renderHistory(){const ms=[...state.movements].sort((a,b)=>new Date(b.at)-new Date(a.at));document.getElementById('history').innerHTML=`<div class="hero"><div><h2>Storico</h2><p>Movimenti, inventari, utensili e ubicazioni</p></div><button class="btn secondary small" onclick="exportCSV()">CSV</button></div>${ms.length?`<div class="tablewrap"><table><thead><tr><th>Data</th><th>Codice</th><th>Tipo</th><th>Sede / percorso</th><th>Q.tà</th><th>Prima → Dopo</th><th>Macchina</th><th>ODL</th><th>Operatore</th><th>Rif.</th></tr></thead><tbody>${ms.map(m=>{const i=itemById(m.itemId),plus=['IN','ADJ+','RETURN'].includes(m.type),neutral=['TRANSFER','RELOCATE','ASSIGN'].includes(m.type),cls=neutral?'accent':plus?'positive':'negative',prefix=m.type==='TRANSFER'?'↔ ':m.type==='RELOCATE'?'⌖ ':m.type==='ASSIGN'?'→ ':m.type==='RETURN'?'← ':plus?'+':'-';return `<tr><td>${dateIt(m.at)}</td><td>${esc(i?.code||'-')}</td><td>${movementTypeLabel(m)}</td><td>${esc(historyRoute(m))}</td><td class="${cls}">${prefix}${m.type==='RELOCATE'?'':fmt(m.qty)}</td><td>${esc(historyBeforeAfter(m))}</td><td>${esc(m.machine||'')}</td><td>${esc(m.odl||'')}</td><td>${esc(m.operator||'')}</td><td>${esc(m.reference||'')}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Nessun movimento registrato.</div>'}`}
+
+function qrPayload(i){if(location.protocol==='http:'||location.protocol==='https:'){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('item',i.code);return u.toString()}return 'OSTOCK:'+i.code}
+function locationQrPayload(l){if(location.protocol==='http:'||location.protocol==='https:'){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('location',l.code);return u.toString()}return 'OSLOC:'+l.code}
+function openLabel(id){const i=itemById(id);openModal(`<div class="sheetHead"><h3>Etichetta articolo</h3><button class="iconbtn" onclick="closeModal()">✕</button></div><div class="labelPreview"><div><h3>${esc(i.code)}</h3><div class="desc">${esc(i.description)}</div><div class="category">${esc(i.category||'Altro')}</div><svg id="barcodeSvg" class="barcode" viewBox="0 0 300 70" preserveAspectRatio="none"></svg><div class="barcodeText">${esc(i.code)}</div></div><div class="qrWrap"><canvas id="qrCanvas" class="qrCode" width="264" height="264" aria-label="QR articolo"></canvas><div>QR OPERATIVO</div></div></div><p class="info"><b>Etichetta permanente:</b> contiene solo dati stabili dell'articolo. Giacenze e ubicazioni aggiornate vengono mostrate nell'app dopo la scansione.</p><div class="actions"><button class="btn secondary" onclick="closeModal()">Chiudi</button><button class="btn" onclick="window.print()">Stampa</button></div>`);setTimeout(()=>{drawCode128(document.getElementById('barcodeSvg'),i.code);drawQR(document.getElementById('qrCanvas'),qrPayload(i))},0)}
+function openLocationLabel(id){const l=locById(id);if(!l)return;openModal(`<div class="sheetHead"><h3>Etichetta ubicazione</h3><button class="iconbtn" onclick="closeModal()">✕</button></div><div class="locationLabel"><div><h3>${esc(l.code)}</h3><div class="path"><b>${esc(siteName(l.site))}</b><br>${esc(locationShort(l))}${l.name?`<br>${esc(l.name)}`:''}</div><svg id="locBarcodeSvg" class="barcode" viewBox="0 0 300 70" preserveAspectRatio="none"></svg><div class="barcodeText">${esc(l.code)}</div></div><div class="qrWrap"><canvas id="locQrCanvas" class="qrCode" width="264" height="264" aria-label="QR ubicazione"></canvas><div>QR POSIZIONE</div></div></div><p class="info">Scansiona questo QR nella modalità Inventario per selezionare subito la posizione.</p><div class="actions"><button class="btn secondary" onclick="closeModal()">Chiudi</button><button class="btn" onclick="window.print()">Stampa</button></div>`);setTimeout(()=>{drawCode128(document.getElementById('locBarcodeSvg'),l.code);drawQR(document.getElementById('locQrCanvas'),locationQrPayload(l))},0)}
+function drawQR(canvas,text){
+ if(!canvas)return;
+ const ctx=canvas.getContext&&canvas.getContext('2d');
+ if(!ctx)return;
+ const W=canvas.width||246,H=canvas.height||246;
+ ctx.imageSmoothingEnabled=false;
+ ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+ try{
+  if(!window.OfficinaQRCode)throw new Error('Motore QR non disponibile');
+  const qr=new window.OfficinaQRCode(-1,1);qr.addData(String(text));qr.make();
+  const n=qr.getModuleCount(),quiet=4,total=n+quiet*2;
+  const scale=Math.max(1,Math.floor(Math.min(W,H)/total));
+  const size=scale*total,ox=Math.floor((W-size)/2),oy=Math.floor((H-size)/2);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#000';
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(qr.isDark(r,c))ctx.fillRect(ox+(c+quiet)*scale,oy+(r+quiet)*scale,scale,scale);
+  canvas.dataset.qr='ok';
+ }catch(e){
+  canvas.dataset.qr='error';
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#b42318';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ERRORE QR',W/2,H/2);
+  console.error('Errore generazione QR',e);
+ }
+}
+function drawCode128(svg,text){if(!svg)return;const patterns=['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];let vals=[];for(const ch of text){let v=ch.charCodeAt(0)-32;if(v<0||v>94)v=31;vals.push(v)}let checksum=104;vals.forEach((v,i)=>checksum+=v*(i+1));checksum%=103;const seq=[104,...vals,checksum,106];let x=8,units=seq.reduce((a,v)=>a+[...patterns[v]].reduce((s,n)=>s+Number(n),0),0)+16;svg.setAttribute('viewBox',`0 0 ${units} 70`);let out='';for(const v of seq){const p=patterns[v];let black=true;for(const c of p){const w=Number(c);if(black)out+=`<rect x="${x}" y="2" width="${w}" height="62" fill="#000"/>`;x+=w;black=!black}}svg.innerHTML=out}
+
+function openSettings(){openModal(`<div class="sheetHead"><h3>Impostazioni</h3><button class="iconbtn" onclick="closeModal()">✕</button></div><form class="formgrid" onsubmit="saveSettings(event)"><div class="field"><label>Nome officina / reparto</label><input class="input" name="shopName" value="${esc(state.settings.shopName)}"></div><div class="field"><label>Operatore predefinito</label><input class="input" name="operator" value="${esc(state.settings.operator)}"></div><div class="field"><label>Tema interfaccia</label><select name="theme"><option value="light" ${state.settings.theme!=='dark'?'selected':''}>Chiaro (predefinito)</option><option value="dark" ${state.settings.theme==='dark'?'selected':''}>Scuro</option></select></div><div class="row2"><div class="field"><label>Lead time predefinito</label><input class="input" type="number" name="defaultLead" value="${int(state.settings.defaultLead,7)}"></div><div class="field"><label>Sicurezza predefinita</label><input class="input" type="number" name="safetyDays" value="${int(state.settings.safetyDays,7)}"></div></div><button class="btn">Salva impostazioni</button></form><div class="divider"></div><b>Ubicazioni gerarchiche</b><p class="info">Struttura: sede → zona → armadio → scaffale → cassetto → posizione. Ogni ubicazione può avere un QR dedicato.</p><div class="kpiList" style="margin-top:9px">${[...state.locations].sort((a,b)=>String(a.site).localeCompare(String(b.site))||locationPath(a).localeCompare(locationPath(b))).map(l=>`<div class="kpiRow"><span><b>${esc(l.code)}</b> <span class="siteTag">${esc(siteName(l.site))}</span><br><small>${esc(locationShort(l))}</small></span><span style="display:flex;gap:5px"><button class="btn secondary small" onclick="openLocationLabel('${l.id}')">QR</button><button class="btn secondary small" onclick="editLocation('${l.id}')">Modifica</button></span></div>`).join('')}</div><button class="btn secondary" style="width:100%;margin-top:9px" onclick="editLocation('')">+ Nuova ubicazione</button><div class="divider"></div><b>Backup dati</b><p class="info">I dati sono salvati nel database SQLite Android; le foto restano come file locali separati. Il backup completo è cifrato AES-256-GCM.</p><div class="row2"><button class="btn secondary" onclick="exportBackup()">Esporta backup</button><button class="btn secondary" onclick="document.getElementById('importFile').click()">Importa backup</button></div><input id="importFile" type="file" accept=".ostock,application/json" style="display:none" onchange="importBackup(this.files[0])"><button class="btn danger" style="width:100%;margin-top:10px" onclick="resetAll()">Azzera archivio</button><p class="info">Versione ${VERSION} · SQLite Android · Backup AES-256-GCM · Home scanner rapido · Tema chiaro/scuro · Rovigo + Crespino · QR articoli e ubicazioni · Inventario guidato · Gestione utensili.</p>`)}
+function saveSettings(e){e.preventDefault();const f=new FormData(e.target);state.settings.shopName=String(f.get('shopName')).trim();state.settings.operator=String(f.get('operator')).trim();state.settings.theme=String(f.get('theme')||'light')==='dark'?'dark':'light';state.settings.defaultLead=int(f.get('defaultLead'),7);state.settings.safetyDays=int(f.get('safetyDays'),7);save();applyTheme();closeModal();render();toast('Impostazioni salvate')}
+function editLocation(id){const l=id?locById(id):{code:'',name:'',area:'',zone:'',cabinet:'',shelf:'',drawer:'',position:'',site:'ROVIGO',notes:''};openModal(`<div class="sheetHead"><h3>${id?'Modifica ubicazione':'Nuova ubicazione'}</h3><button class="iconbtn" onclick="closeModal()">✕</button></div><form class="formgrid" onsubmit="saveLocation(event,'${id}')"><div class="row2"><div class="field"><label>Sede *</label><select name="site">${SITES.map(s=>`<option value="${s.id}" ${l.site===s.id?'selected':''}>${s.name}</option>`).join('')}</select></div><div class="field"><label>Codice *</label><input class="input" name="code" required value="${esc(l.code)}" placeholder="ROV-A01-S02-C04"></div></div><div class="row2"><div class="field"><label>Zona</label><input class="input" name="zone" value="${esc(l.zone||l.area||'')}" placeholder="Officina / Magazzino"></div><div class="field"><label>Armadio / struttura</label><input class="input" name="cabinet" value="${esc(l.cabinet||'')}" placeholder="A"></div></div><div class="row3"><div class="field"><label>Scaffale</label><input class="input" name="shelf" value="${esc(l.shelf||'')}" placeholder="2"></div><div class="field"><label>Cassetto</label><input class="input" name="drawer" value="${esc(l.drawer||'')}" placeholder="04"></div><div class="field"><label>Posizione</label><input class="input" name="position" value="${esc(l.position||'')}" placeholder="B"></div></div><div class="field"><label>Descrizione</label><input class="input" name="name" value="${esc(l.name||'')}" placeholder="Cassettiera sensori"></div><div class="field"><label>Note</label><textarea name="notes">${esc(l.notes||'')}</textarea></div><div class="actions">${id?`<button type="button" class="btn danger" onclick="deleteLocation('${id}')">Elimina</button>`:''}<button class="btn">Salva</button></div></form>`)}
+function saveLocation(e,id){e.preventDefault();const f=new FormData(e.target),code=String(f.get('code')).trim();if(state.locations.some(x=>x.code.toLowerCase()===code.toLowerCase()&&x.id!==id)){toast('Codice ubicazione già esistente');return}const zone=String(f.get('zone')).trim(),d={site:String(f.get('site')),code,name:String(f.get('name')).trim(),zone,area:zone,cabinet:String(f.get('cabinet')).trim(),shelf:String(f.get('shelf')).trim(),drawer:String(f.get('drawer')).trim(),position:String(f.get('position')).trim(),notes:String(f.get('notes')).trim()};if(id){const old=locById(id);if(old.site!==d.site&&state.items.some(i=>Object.values(i.siteLocationIds||{}).includes(id))){toast('Non puoi cambiare sede: ubicazione già assegnata a un articolo');return}Object.assign(old,d)}else state.locations.push({id:uid(),...d});save();openSettings();toast('Ubicazione salvata')}
+function deleteLocation(id){if(state.items.some(i=>Object.values(i.siteLocationIds||{}).includes(id))){toast('Ubicazione usata da uno o più articoli');return}if(!confirm('Eliminare questa ubicazione?'))return;state.locations=state.locations.filter(x=>x.id!==id);save();openSettings()}
+
+function exportBackup(){const pwd=prompt('Password per cifrare il backup (minimo 8 caratteri):','');if(pwd===null)return;if(pwd.length<8){toast('Password troppo corta: usa almeno 8 caratteri');return}const raw=JSON.stringify(state);if(window.NativeBridge&&typeof NativeBridge.exportEncryptedBackup==='function'){const res=NativeBridge.exportEncryptedBackup(raw,pwd);toast(String(res||'Backup completato'));return}toast('Backup cifrato disponibile solo nell’app Android 2.7.0')}
+function importBackup(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{let raw=String(r.result||'');let s;try{const e=JSON.parse(raw);if(e&&e.format==='OFFICINA_STOCK_ENCRYPTED'){const pwd=prompt('Password del backup:','');if(pwd===null)return;if(!(window.NativeBridge&&typeof NativeBridge.decryptBackup==='function'))throw new Error('Cifratura non supportata');raw=NativeBridge.decryptBackup(raw,pwd);if(String(raw).startsWith('ERR:'))throw new Error(raw);s=JSON.parse(raw)}else{s=e}}catch(inner){if(!s)s=JSON.parse(raw)}if(!Array.isArray(s.items)||!Array.isArray(s.movements)||!Array.isArray(s.locations))throw new Error('Struttura non valida');state=migrateState(s);save();closeModal();render();toast('Backup importato in SQLite')}catch(err){console.error(err);toast('Backup non valido o password errata')}finally{document.getElementById('importFile')&&(document.getElementById('importFile').value='')}};r.readAsText(file)}
+function exportCSV(){let rows=[['Data','Codice','Descrizione','Tipo','Sede/Percorso','Quantità','Prima/Dopo','Macchina/Impianto','ODL','Assegnato a','Operatore','Riferimento','Nota']];[...state.movements].sort((a,b)=>new Date(a.at)-new Date(b.at)).forEach(m=>{const i=itemById(m.itemId);rows.push([m.at,i?.code||'',i?.description||'',movementTypeLabel(m),historyRoute(m),m.qty,historyBeforeAfter(m),m.machine||'',m.odl||'',m.assignee||'',m.operator||'',m.reference||'',m.note||''])});const csv=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(';')).join('\n'),name=`OfficinaStock_movimenti_${new Date().toISOString().slice(0,10)}.csv`;if(window.NativeBridge&&typeof NativeBridge.saveTextFile==='function'){toast(String(NativeBridge.saveTextFile(name,'text/csv','\ufeff'+csv)||'CSV esportato'));return}downloadBlob(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),name)}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function resetAll(){if(!confirm('ATTENZIONE: cancellare articoli, movimenti e impostazioni?'))return;state=initialState();save();closeModal();render();toast('Archivio azzerato')}
+
+async function openScanner(mode){const supports='BarcodeDetector' in window&&navigator.mediaDevices?.getUserMedia;if(!supports){toast('Scanner fotocamera non disponibile qui. Usa la ricerca manuale o un lettore barcode/QR Bluetooth.');return}const msg=mode==='countLocation'?'Inquadra il QR dell’ubicazione.':mode==='countItem'?'Inquadra il codice dell’articolo da contare.':'Inquadra il Code128 o il QR dell’etichetta.';openModal(`<div class="sheetHead"><h3>Scansiona codice</h3><button class="iconbtn" onclick="closeModal()">✕</button></div><p class="info">${msg}</p><div class="scanner open"><video id="scanVideo" autoplay playsinline muted></video><div class="scanline"></div></div><div class="field" style="margin-top:10px"><label>Oppure inserisci il codice</label><div class="searchbar"><input id="manualScan" class="input"><button class="btn small" onclick="useScan('${mode}',document.getElementById('manualScan').value)">Apri</button></div></div>`);try{ui.scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});const v=document.getElementById('scanVideo');v.srcObject=ui.scannerStream;const det=new BarcodeDetector({formats:['code_128','qr_code','ean_13','ean_8','code_39']});const loop=async()=>{if(!ui.scannerStream||!document.getElementById('scanVideo'))return;try{const codes=await det.detect(v);if(codes.length){useScan(mode,codes[0].rawValue);return}}catch{}requestAnimationFrame(loop)};requestAnimationFrame(loop)}catch(e){toast('Fotocamera non autorizzata o non disponibile')}}
+function stopScanner(){if(ui.scannerStream){ui.scannerStream.getTracks().forEach(t=>t.stop());ui.scannerStream=null}}
+function parseScanned(raw){let code=String(raw||'').trim();if(code.toUpperCase().startsWith('OSLOC:'))return {kind:'location',code:code.slice(6).trim()};if(code.toUpperCase().startsWith('OSTOCK:'))return {kind:'item',code:code.slice(8).trim()};try{const u=new URL(code),l=u.searchParams.get('location'),i=u.searchParams.get('item');if(l)return {kind:'location',code:l.trim()};if(i)return {kind:'item',code:i.trim()}}catch{}if(state.locations.some(l=>l.code.toLowerCase()===code.toLowerCase()))return {kind:'location',code};return {kind:'item',code}}
+function useScan(mode,raw){const p=parseScanned(raw);if(mode==='countLocation'){if(p.kind!=='location'){toast('Questo è un codice articolo, non una posizione');return}const l=state.locations.find(x=>x.code.toLowerCase()===p.code.toLowerCase());if(!l){toast('Ubicazione non presente in archivio');return}stopScanner();closeModal();ui.countSite=l.site;ui.countLocationId=l.id;ui.countValues={};nav('count');toast(`Posizione ${l.code} selezionata`);return}if(p.kind!=='item'){toast('Questo QR identifica una posizione');return}const i=findItemFromScan(raw);if(!i){toast('Codice non presente in archivio');return}stopScanner();closeModal();if(mode==='countItem'){const loc=locById(ui.countLocationId);if(!loc){toast('Seleziona prima una posizione');return}if(i.siteLocationIds?.[ui.countSite]!==loc.id){toast(`Articolo assegnato a ${locationShort(itemLoc(i,ui.countSite))}, non a questa posizione`);return}const val=prompt(`Quantità fisica di ${i.code} (${i.description})`,String(siteQty(i,ui.countSite)));if(val===null)return;const q=num(val,-1);if(q<0){toast('Quantità non valida');return}ui.countValues[i.id]=String(q);ui.countHighlight=i.id;nav('count');setTimeout(()=>{ui.countHighlight=''},1400);return}if(mode==='movement'){ui.selectedItem=i.id;nav('movement')}else{ui.search=i.code;nav('inventory')}}
+function handleDeepLink(){try{const u=new URL(location.href),code=u.searchParams.get('item'),locCode=u.searchParams.get('location');if(locCode){const l=state.locations.find(x=>x.code.toLowerCase()===locCode.toLowerCase());if(l){ui.appMode='scan';ui.page='scanhome';render();setTimeout(()=>openScannedLocation(l),80);return}}if(!code)return;const i=state.items.find(x=>x.code.toLowerCase()===code.toLowerCase());if(i){ui.appMode='scan';ui.page='scanhome';render();setTimeout(()=>openQuickArticle(i),80)}}catch{}}
+
+updateModeChrome();render();
+setTimeout(handleDeepLink,0);
+</script>
+</body>
+</html>
