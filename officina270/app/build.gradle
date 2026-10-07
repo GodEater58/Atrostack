@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.dawasafe.app'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.dawasafe.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 270
+        versionName '2.7.0'
+    }
+}
