@@ -13,6 +13,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.view.View;
+import android.view.WindowInsets;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -26,6 +28,12 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         webView = new WebView(this);
         setContentView(webView);
+        webView.setOnApplyWindowInsetsListener((View v, WindowInsets insets) -> {
+            int top = insets.getSystemWindowInsetTop();
+            v.setPadding(0, top, 0, 0);
+            return insets;
+        });
+        webView.requestApplyInsets();
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
